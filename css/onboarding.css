@@ -1,0 +1,143 @@
+.spb-lock{overflow:hidden}.spb-modal-layer{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,35,44,.72);backdrop-filter:blur(3px)}.spb-modal-layer[hidden]{display:none}.spb-modal{width:min(720px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.28);padding:28px;color:#1e3c4a}.spb-modal h2{margin:0 0 16px;font-size:28px}.spb-modal h3{margin:22px 0 8px}.spb-modal p,.spb-modal li{line-height:1.55}.spb-legal{padding:16px;border-left:5px solid #109eaa;background:#edf8f9;border-radius:10px}.spb-check{display:flex;gap:10px;align-items:flex-start;margin:20px 0;font-weight:600}.spb-check input{width:auto;margin-top:4px}.spb-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:22px}.spb-actions button{border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer}.spb-actions .spb-primary{background:#109eaa;color:#fff}.spb-actions .spb-secondary{background:#8c307b;color:#fff}.spb-actions .spb-ghost{background:#fff;color:#1e3c4a;border:1px solid #c9d5d9}.spb-actions button:disabled{opacity:.45;cursor:not-allowed}.spb-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.spb-form-grid label{display:block;font-weight:600}.spb-form-grid input{width:100%;margin-top:6px;padding:12px;border:1px solid #b9c8cd;border-radius:9px;font:inherit}.spb-form-grid .spb-wide{grid-column:1/-1}.spb-tour{width:min(590px,calc(100% - 28px));position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:10001;background:#fff;border:2px solid #109eaa;border-radius:16px;padding:22px;box-shadow:0 18px 60px rgba(0,0,0,.3)}.spb-tour[hidden]{display:none}.spb-tour-top{display:flex;justify-content:space-between;gap:16px}.spb-tour-step{color:#8c307b;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.08em}.spb-tour h3{margin:8px 0}.spb-tour p{margin:0;line-height:1.55}.spb-tour-progress{height:7px;background:#dfe9ec;border-radius:99px;margin:18px 0;overflow:hidden}.spb-tour-progress i{display:block;height:100%;background:#109eaa;transition:.2s}.spb-highlight{position:relative;z-index:10002!important;outline:4px solid #f3b334!important;outline-offset:5px;border-radius:8px}.spb-greeting{max-width:1180px;margin:18px auto 0;padding:0 22px;color:#1e3c4a;font-size:22px;font-weight:700}.spb-footer{margin-top:42px;padding:28px max(22px,calc((100vw - 1180px)/2));background:#1e3c4a;color:#d9e6ea;font-size:12px;line-height:1.55}.spb-footer-links{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px}.spb-footer button{padding:0;border:0;background:none;color:#fff;text-decoration:underline;font:600 14px inherit;cursor:pointer}.spb-footer a{color:#fff}.spb-footer p{margin:10px 0}.spb-migrate-options{display:grid;grid-template-columns:1fr 1fr;gap:16px}.spb-migrate-card{border:1px solid #d7e2e5;border-radius:12px;padding:18px}.spb-warning{background:#fff4d8;border-left:5px solid #c17b14;padding:14px;border-radius:9px;margin:15px 0}.spb-summary{background:#f4f7f8;border-radius:10px;padding:14px;margin:14px 0}.spb-hidden-input{display:none}@media(max-width:650px){.spb-modal{padding:20px}.spb-form-grid,.spb-migrate-options{grid-template-columns:1fr}.spb-form-grid .spb-wide{grid-column:auto}.spb-tour{bottom:10px}.spb-greeting{padding:0 14px}}
+.profile {
+    display: none !important;
+}
+
+.disclaimer {
+    display: none !important;
+}
+/* Keep the onboarding guide above the highlighted page content */
+.spb-tour {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    z-index: 10020;
+    width: min(590px, calc(100% - 28px));
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+/* Highlight the relevant control without placing it over the guide */
+.spb-highlight {
+    position: relative;
+    z-index: 10001 !important;
+    outline: 4px solid #f3b334 !important;
+    outline-offset: 5px;
+    border-radius: 8px;
+}
+
+/* Add a backdrop while the mandatory guide is open */
+body.spb-lock::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(15, 35, 44, 0.55);
+    pointer-events: none;
+}
+
+/* Keep onboarding modals above everything */
+.spb-modal-layer {
+    z-index: 10030;
+}
+
+@media (max-width: 650px) {
+    .spb-tour {
+        top: 50%;
+        bottom: auto;
+        width: calc(100% - 20px);
+        max-height: calc(100vh - 20px);
+    }
+}
+/* Remove the dark guide backdrop */
+body.spb-lock::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* Disable the application while mandatory guidance is open */
+body.spb-guidance-active .topbar,
+body.spb-guidance-active .nav,
+body.spb-guidance-active .spb-greeting,
+body.spb-guidance-active main,
+body.spb-guidance-active .spb-footer {
+    pointer-events: none !important;
+    user-select: none;
+}
+
+/* Keep the guide itself usable */
+body.spb-guidance-active .spb-tour {
+    pointer-events: auto !important;
+    user-select: auto;
+}
+
+/* The highlighted item remains visible but cannot be clicked */
+body.spb-guidance-active .spb-highlight {
+    pointer-events: none !important;
+}
+
+/* Keep the guide above all highlighted content */
+.spb-tour {
+    z-index: 10020 !important;
+    background: #ffffff;
+}
+
+/* Highlight without darkening the rest of the page */
+.spb-highlight {
+    z-index: auto !important;
+    outline: 4px solid #f3b334 !important;
+    outline-offset: 5px;
+}
+/* Keep disclaimer and details forms interactive */
+.spb-modal-layer {
+    pointer-events: auto !important;
+    z-index: 10030 !important;
+}
+
+.spb-modal,
+.spb-modal * {
+    pointer-events: auto !important;
+}
+
+/* Keep the mandatory guide interactive */
+.spb-tour,
+.spb-tour * {
+    pointer-events: auto !important;
+}
+
+/* Block only the original app while guidance is active */
+body.spb-guidance-active .topbar,
+body.spb-guidance-active .nav,
+body.spb-guidance-active .spb-greeting,
+body.spb-guidance-active main,
+body.spb-guidance-active .spb-footer {
+    pointer-events: none !important;
+}
+
+/* The guide and modal must remain available */
+body.spb-guidance-active .spb-tour,
+body.spb-guidance-active .spb-tour *,
+body.spb-guidance-active .spb-modal-layer,
+body.spb-guidance-active .spb-modal-layer * {
+    pointer-events: auto !important;
+}
+#spbMigrationDownloadArea {
+    margin-top: 16px;
+}
+
+#spbDownloadMigration {
+    display: inline-block;
+    padding: 12px 18px;
+    border-radius: 10px;
+    background: #109eaa;
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#spbDownloadMigration:hover {
+    filter: brightness(0.92);
+}
