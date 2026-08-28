@@ -3,7 +3,7 @@
 
     let deferredInstallPrompt = null;
 
-    function isInstalled() {
+    function isRunningAsInstalledApp() {
         return (
             window.matchMedia(
                 "(display-mode: standalone)"
@@ -12,26 +12,23 @@
         );
     }
 
-    function getFooterLinks() {
-        return document.querySelector(
-            ".spb-footer-links"
-        );
-    }
-
     function createInstallButton() {
-        if (
+        const existingButton =
             document.getElementById(
                 "spbInstallApp"
-            )
-        ) {
-            return;
+            );
+
+        if (existingButton) {
+            return existingButton;
         }
 
         const footerLinks =
-            getFooterLinks();
+            document.querySelector(
+                ".spb-footer-links"
+            );
 
         if (!footerLinks) {
-            return;
+            return null;
         }
 
         const installButton =
@@ -39,8 +36,16 @@
 
         installButton.type = "button";
         installButton.id = "spbInstallApp";
-        installButton.textContent = "Install App";
-        installButton.hidden = true;
+        installButton.textContent =
+            "Install App";
+
+        /*
+         * Keep the button visible in a normal browser tab.
+         * Hide it only when the application is already
+         * running in its installed standalone window.
+         */
+        installButton.hidden =
+            isRunningAsInstalledApp();
 
         footerLinks.insertBefore(
             installButton,
@@ -49,13 +54,24 @@
 
         installButton.addEventListener(
             "click",
-            installApplication
+            handleInstallClick
         );
+
+        return installButton;
     }
 
-    async function installApplication() {
+    async function handleInstallClick() {
+        if (isRunningAsInstalledApp()) {
+            window.alert(
+                "The Specialist Portfolio Builder " +
+                "is already running as an installed app."
+            );
+
+            return;
+        }
+
         if (!deferredInstallPrompt) {
-            showInstallationHelp();
+            showInstallInstructions();
             return;
         }
 
@@ -71,11 +87,10 @@
         }
 
         try {
-            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.prompt();
 
             const choice =
-                await deferredInstallPrompt
-                    .userChoice;
+                await deferredInstallPrompt.userChoice;
 
             deferredInstallPrompt = null;
 
@@ -85,7 +100,11 @@
                 if (installButton) {
                     installButton.hidden = true;
                 }
-            } else if (installButton) {
+
+                return;
+            }
+
+            if (installButton) {
                 installButton.disabled = false;
                 installButton.textContent =
                     "Install App";
@@ -102,20 +121,11 @@
                     "Install App";
             }
 
-            showInstallationHelp();
+            showInstallInstructions();
         }
     }
 
-    function showInstallationHelp() {
-        if (isInstalled()) {
-            window.alert(
-                "The Specialist Portfolio Builder " +
-                "is already installed on this device."
-            );
-
-            return;
-        }
-
+    function showInstallInstructions() {
         const isAppleMobile =
             /iphone|ipad|ipod/i.test(
                 navigator.userAgent
@@ -135,13 +145,15 @@
         }
 
         window.alert(
-            "The browser has not made installation " +
-            "available yet.\n\n" +
-            "In Microsoft Edge, open the browser menu, " +
-            "select Apps, then select Install this site " +
-            "as an app.\n\n" +
-            "If the app is already installed, open it " +
-            "from the Start menu."
+            "Installation is not currently available " +
+            "from this browser page.\n\n" +
+            "This may be because the app is already " +
+            "installed, the page is being tested on " +
+            "localhost, or the browser has not yet " +
+            "confirmed that the app is installable.\n\n" +
+            "In Microsoft Edge, you can also open " +
+            "the three-dot menu, select Apps, then " +
+            "select Install this site as an app."
         );
     }
 
@@ -152,17 +164,10 @@
 
             deferredInstallPrompt = event;
 
-            createInstallButton();
-
             const installButton =
-                document.getElementById(
-                    "spbInstallApp"
-                );
+                createInstallButton();
 
-            if (
-                installButton &&
-                !isInstalled()
-            ) {
+            if (installButton) {
                 installButton.hidden = false;
                 installButton.disabled = false;
                 installButton.textContent =
@@ -187,20 +192,42 @@
         }
     );
 
-    function initialiseInstallButton() {
-        createInstallButton();
-
+    function initialiseInstallFeature() {
         const installButton =
-            document.getElementById(
-                "spbInstallApp"
-            );
+            createInstallButton();
 
-        if (
-            installButton &&
-            isInstalled()
-        ) {
-            installButton.hidden = true;
+        if (installButton) {
+            installButton.hidden =
+                isRunningAsInstalledApp();
+
+            return;
         }
+
+        /*
+         * onboarding.js creates the footer dynamically.
+         * Watch for the footer and add the button as
+         * soon as it appears.
+         */
+        const observer =
+            new MutationObserver(function () {
+                const button =
+                    createInstallButton();
+
+                if (button) {
+                    button.hidden =
+                        isRunningAsInstalledApp();
+
+                    observer.disconnect();
+                }
+            });
+
+        observer.observe(
+            document.body,
+            {
+                childList: true,
+                subtree: true
+            }
+        );
     }
 
     if (
@@ -208,12 +235,12 @@
     ) {
         document.addEventListener(
             "DOMContentLoaded",
-            initialiseInstallButton,
+            initialiseInstallFeature,
             {
                 once: true
             }
         );
     } else {
-        initialiseInstallButton();
+        initialiseInstallFeature();
     }
 })();
