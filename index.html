@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1e3c4a">
+
+    <title>Specialist Portfolio Builder</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/onboarding.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <div>
+            <h1>Specialist Portfolio Builder</h1>
+            <p>Guided evidence mapping and portfolio creation</p>
+        </div>
+
+        <button class="iconbtn" id="menuBtn" aria-label="Menu">☰</button>
+    </header>
+
+    <nav class="nav" id="nav">
+        <button data-screen="dashboard" class="active">Dashboard</button>
+        <button data-screen="library">Evidence Library</button>
+        <button data-screen="upload">Upload Evidence</button>
+        <button data-screen="progress">Progress</button>
+        <button data-screen="export">Portfolio Export</button>
+    </nav>
+
+    <main class="shell">
+        <section id="dashboard" class="screen active">
+            <div class="hero card">
+                <div>
+                    <span class="eyebrow">Overall portfolio completion</span>
+
+                    <div class="hero-row">
+                        <strong id="overallPct">0%</strong>
+                        <span id="criteriaSummary">0 of 44 criteria complete</span>
+                    </div>
+
+                    <div class="bar">
+                        <i id="overallBar"></i>
+                    </div>
+                </div>
+
+                <button class="primary" data-screen="upload">Upload Evidence</button>
+            </div>
+
+            <div class="stats">
+                <article>
+                    <b id="completeCount">0</b>
+                    <span>Complete</span>
+                </article>
+
+                <article>
+                    <b id="progressCount">0</b>
+                    <span>In progress</span>
+                </article>
+
+                <article>
+                    <b id="outstandingCount">0</b>
+                    <span>Outstanding</span>
+                </article>
+
+                <article>
+                    <b id="evidenceCount">0</b>
+                    <span>Evidence items</span>
+                </article>
+
+                <article>
+                    <b id="withReflection">0</b>
+                    <span>With reflection</span>
+                </article>
+
+                <article>
+                    <b id="withoutReflection">0</b>
+                    <span>Without reflection</span>
+                </article>
+            </div>
+
+            <h2>Domain progress</h2>
+            <div id="dashboardDomains" class="domain-grid"></div>
+
+            <aside class="disclaimer">
+                <b>Disclaimer:</b>
+                Completion figures are representative of the information entered by the user and are intended as a portfolio planning aid only. They do not indicate that portfolio requirements have been met, nor do they guarantee the success of any application.
+            </aside>
+        </section>
+
+        <section id="upload" class="screen">
+            <div class="pagehead">
+                <div>
+                    <span class="eyebrow">Evidence</span>
+                    <h2 id="uploadHeading">Upload evidence</h2>
+                </div>
+
+                <button class="ghost" data-screen="dashboard">Cancel</button>
+            </div>
+
+            <form id="evidenceForm" class="card form">
+                <input type="hidden" id="editId">
+
+                <label>
+                    Evidence file
+                    <input id="evidenceFile" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp,.tif,.tiff,.txt">
+                </label>
+
+                <div class="two">
+                    <label>
+                        Evidence name
+                        <input id="evidenceTitle" required>
+                    </label>
+
+                    <label>
+                        Activity date
+                        <input id="evidenceDate" type="date" required>
+                    </label>
+                </div>
+
+                <fieldset>
+                    <legend>Evidence types</legend>
+                    <p>Select all that apply. The most commonly used types remain near the top.</p>
+                    <input id="typeSearch" placeholder="Search evidence types">
+                    <div id="evidenceTypes" class="check-grid"></div>
+                </fieldset>
+
+                <aside class="suggest">
+                    <b>Commonly associated domains and criteria</b>
+                    <p id="suggestions">Select an evidence type to see suggestions. Suggestions are guidance only and are never selected automatically.</p>
+                </aside>
+
+                <fieldset>
+                    <legend>Domains and criteria</legend>
+                    <p>Select a domain, then add one or more criteria. Nothing is selected automatically.</p>
+                    <div id="domainMapper"></div>
+                </fieldset>
+
+                <div class="actions">
+                    <button type="submit" class="primary">Save evidence</button>
+                    <button type="button" class="ghost" data-screen="dashboard">Cancel</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="library" class="screen">
+            <div class="pagehead">
+                <div>
+                    <span class="eyebrow">Evidence</span>
+                    <h2>Evidence library</h2>
+                </div>
+
+                <button class="primary" data-screen="upload">Upload Evidence</button>
+            </div>
+
+            <div class="card">
+                <input id="librarySearch" placeholder="Search by title, type or criterion">
+                <div id="evidenceLibrary" class="library"></div>
+            </div>
+        </section>
+
+        <section id="reflection" class="screen">
+            <div class="pagehead">
+                <div>
+                    <span class="eyebrow">Reflection</span>
+                    <h2 id="reflectionTitle">Add reflection</h2>
+                </div>
+
+                <button class="ghost" data-screen="library">Cancel</button>
+            </div>
+
+            <form id="reflectionForm" class="card form">
+                <input type="hidden" id="reflectionId">
+
+                <label>
+                    What happened? Describe the context and the role you played.
+                    <textarea id="situation"></textarea>
+                </label>
+
+                <label>
+                    What were the key difficulties, uncertainties or challenges?
+                    <textarea id="hindrances"></textarea>
+                </label>
+
+                <label>
+                    What actions did you take?
+                    <textarea id="actions"></textarea>
+                </label>
+
+                <label>
+                    What were the results?
+                    <textarea id="results"></textarea>
+                </label>
+
+                <label>
+                    What are your future plans or learning points?
+                    <textarea id="plan"></textarea>
+                </label>
+
+                <div class="actions">
+                    <button class="primary" type="submit">Save reflection</button>
+                    <button class="ghost" type="button" data-screen="library">Cancel</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="progress" class="screen">
+            <div class="pagehead">
+                <div>
+                    <span class="eyebrow">Progress</span>
+                    <h2>Domain progress</h2>
+                </div>
+            </div>
+
+            <div id="progressDomains" class="domain-grid"></div>
+        </section>
+
+        <section id="domain" class="screen">
+            <div class="pagehead">
+                <div>
+                    <span class="eyebrow">Domain detail</span>
+                    <h2 id="domainTitle">Domain</h2>
+                </div>
+
+                <button class="ghost" data-screen="progress">Back</button>
+            </div>
+
+            <div class="card domain-summary">
+                <strong id="domainPct">0%</strong>
+
+                <div>
+                    <div class="bar">
+                        <i id="domainBar"></i>
+                    </div>
+
+                    <p id="domainSummary"></p>
+                </div>
+            </div>
+
+            <div class="status-section red">
+                <h3>Outstanding</h3>
+                <div id="domainOutstanding"></div>
+            </div>
+
+            <div class="status-section amber">
+                <h3>In progress</h3>
+                <div id="domainProgress"></div>
+            </div>
+
+            <div class="status-section green">
+                <h3>Complete</h3>
+                <div id="domainComplete"></div>
+            </div>
+        </section>
+
+        <section id="export" class="screen">
+            <div class="pagehead">
+                <div>
+                    <span class="eyebrow">Portfolio</span>
+                    <h2>Portfolio export</h2>
+                </div>
+            </div>
+
+            <div class="export-grid">
+                <article class="card">
+                    <h3>Full Portfolio Document</h3>
+                    <p>Creates one Word document containing the portfolio, reflections and inserted evidence.</p>
+                    <button id="fullExport" class="primary">Create Full Portfolio Document</button>
+                </article>
+
+                <article class="card">
+                    <h3>Indexed Portfolio Pack</h3>
+                    <p>Creates a ZIP containing an indexed Word portfolio and every original evidence file.</p>
+                    <button id="indexedExport" class="secondary">Create Indexed Portfolio Pack</button>
+                </article>
+            </div>
+
+            <div class="card profile">
+                <h3>Portfolio details</h3>
+
+                <div class="two">
+                    <label>
+                        Candidate name
+                        <input id="candidateName">
+                    </label>
+
+                    <label>
+                        Specialty
+                        <input id="candidateSpecialty">
+                    </label>
+                </div>
+
+                <button id="saveProfile" class="ghost">Save details</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.12.1/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/onboarding.js"></script>
+    <script src="js/install.js"></script>
+</body>
+</html>
