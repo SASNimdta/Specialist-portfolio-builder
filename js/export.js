@@ -404,12 +404,19 @@ async function exportFull(items) {
                 heading("Evidence types", 2)
             );
 
-            (item.evidenceTypes || []).forEach(type => {
+            children.push(new Paragraph({
+                bullet: { level: 0 },
+                children: [new TextRun(String(item.evidenceType || (item.evidenceTypes || [])[0] || "Not recorded"))]
+            }));
+            (item.evidenceSubtypes || []).forEach(value => {
                 children.push(new Paragraph({
-                    bullet: { level: 0 },
-                    children: [new TextRun(String(type))]
+                    bullet: { level: 1 },
+                    children: [new TextRun(String(value))]
                 }));
             });
+            if (item.appraisalObjectivesCompleted) {
+                children.push(textParagraph("This appraisal shows completed objectives.", { bold: true }));
+            }
 
             children.push(heading("Domains and criteria", 2));
             const groupedCriteria = criteriaByDomain(item);
@@ -582,9 +589,12 @@ async function buildIndexedHtml(items, names, reflectionNames) {
     sortedItems.forEach(item => {
         body += `<h1 id="ev${item.id}">${esc(item.title)}</h1>`;
         body += `<p><b>Date:</b> ${esc(fmtDate(item.date) || "Date not entered")}</p>`;
-        body += "<h2>Evidence types</h2><ul>";
-        body += (item.evidenceTypes || []).map(type => `<li>${esc(type)}</li>`).join("");
-        body += "</ul><h2>Domains and criteria</h2>";
+        body += "<h2>Evidence type</h2><ul>";
+        body += `<li>${esc(item.evidenceType || (item.evidenceTypes || [])[0] || "Not recorded")}</li>`;
+        body += (item.evidenceSubtypes || []).map(value => `<li>${esc(value)}</li>`).join("");
+        body += "</ul>";
+        if (item.appraisalObjectivesCompleted) body += "<p><b>This appraisal shows completed objectives.</b></p>";
+        body += "<h2>Domains and criteria</h2>";
         const grouped = criteriaByDomain(item);
         Object.keys(grouped).map(Number).sort((a, b) => a - b).forEach(domain => {
             body += `<p><b>Domain ${domain}:</b> ${esc(grouped[domain].join(", "))}</p>`;

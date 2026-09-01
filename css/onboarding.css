@@ -141,3 +141,7 @@ body.spb-guidance-active .spb-modal-layer * {
 #spbDownloadMigration:hover {
     filter: brightness(0.92);
 }
+/* Duplicate evidence dialogs use existing modal styling */
+.duplicate-list{display:grid;gap:10px;margin:16px 0}
+.duplicate-match{display:flex;gap:12px;align-items:flex-start;padding:13px;border:1px solid #d7e2e5;border-radius:10px;cursor:pointer}
+.duplicate-match input{margin-top:4px}

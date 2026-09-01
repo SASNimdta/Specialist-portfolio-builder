@@ -834,6 +834,12 @@
                 ...readProfile()
             },
 
+            interviewPlans: JSON.parse(
+                localStorage.getItem(
+                    "spbInterviewPlans"
+                ) || "{}"
+            ),
+
             evidence:
                 migratedEvidence
         };
@@ -1411,6 +1417,13 @@ function showMigration() {
                 PROFILE_KEY,
                 JSON.stringify(
                     migration.profile || {}
+                )
+            );
+
+            localStorage.setItem(
+                "spbInterviewPlans",
+                JSON.stringify(
+                    migration.interviewPlans || {}
                 )
             );
 

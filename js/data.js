@@ -85,450 +85,1415 @@ const APP_DATA = {
     {
       "code": "1.1",
       "domain": 1,
-      "description": "Practises with the professional values and behaviours expected of all doctors as set out in GMC Good Medical Practice and the Generic Professional Capabilities Framework (or equivalent for dentists)",
-      "requiredEvidenceTypes": [
-        "Annual appraisal & evidence collected for appraisal",
-        "Interview",
-        "Mandatory training (UK Core Skills Training Framework)",
-        "Multisource feedback",
-        "Patient feedback"
+      "description": "Practises with the professional values and behaviours expected of all doctors as set out in GMC Good Medical Practice and the Generic Professional Capabilities Framework (or equivalent for dentists).",
+      "minimumRequirements": [
+        {
+          "id": "appraisal",
+          "label": "Appraisal",
+          "types": [
+            "Appraisal"
+          ]
+        },
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "patient",
+          "label": "Patient Feedback",
+          "types": [
+            "Patient Feedback"
+          ]
+        },
+        {
+          "id": "mandatory",
+          "label": "Mandatory training",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "Mandatory training"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "1.2",
       "domain": 1,
-      "description": "Demonstrates the underpinning subject-specific competences i.e. knowledge, skills and behaviours relevant to the role setting and scope",
-      "requiredEvidenceTypes": [
-        "Attendance at relevant courses",
-        "Audit of personal clinical practice",
-        "CPD diary & reflections",
-        "Evidence of reflective practice & examples",
-        "Job plan",
-        "Logbooks",
-        "Multisource feedback",
-        "Patient feedback",
-        "Professional or higher qualifications",
-        "References from colleagues"
+      "description": "Demonstrates the underpinning subject-specific competences i.e. knowledge, skills and behaviours relevant to the role setting and scope.",
+      "minimumRequirements": [
+        {
+          "id": "jobplan",
+          "label": "Scope of Practice / Job Plan",
+          "types": [
+            "Scope of Practice / Job Plan"
+          ]
+        },
+        {
+          "id": "logbook",
+          "label": "Logbook",
+          "types": [
+            "Logbook"
+          ]
+        },
+        {
+          "id": "audit",
+          "label": "Audit",
+          "types": [
+            "Audit"
+          ]
+        },
+        {
+          "id": "reference",
+          "label": "Reference",
+          "types": [
+            "Reference"
+          ]
+        },
+        {
+          "id": "appraisal",
+          "label": "Appraisal",
+          "types": [
+            "Appraisal"
+          ]
+        },
+        {
+          "id": "course",
+          "label": "Accredited or relevant course",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "Accredited or relevant course"
+          ]
+        },
+        {
+          "id": "cpd",
+          "label": "CPD Diary",
+          "types": [
+            "CPD Diary"
+          ]
+        },
+        {
+          "id": "qualification",
+          "label": "Qualification",
+          "types": [
+            "Qualification"
+          ]
+        }
       ]
     },
     {
       "code": "1.3",
       "domain": 1,
       "description": "Clinically evaluates and manages a patient, formulating a prioritised differential diagnosis, initiating an appropriate management plan, and reviewing and adjusting this depending on the outcomes of treatment.",
-      "requiredEvidenceTypes": [
-        "Annual appraisal & evidence collected for appraisal",
-        "Audit of personal clinical practice",
-        "Evidence of reflective practice & examples",
-        "Job plan",
-        "Multisource feedback",
-        "Patient feedback",
-        "References from colleagues"
+      "minimumRequirements": [
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "patient",
+          "label": "Patient Feedback",
+          "types": [
+            "Patient Feedback"
+          ]
+        },
+        {
+          "id": "reference",
+          "label": "Reference",
+          "types": [
+            "Reference"
+          ]
+        },
+        {
+          "id": "audit",
+          "label": "Audit",
+          "types": [
+            "Audit"
+          ]
+        },
+        {
+          "id": "appraisal",
+          "label": "Appraisal",
+          "types": [
+            "Appraisal"
+          ]
+        }
       ]
     },
     {
       "code": "1.4",
       "domain": 1,
-      "description": "Manages the difficulties of dealing with complexity and uncertainty in the care of patients; employing expertise and clinical decision-making skills of a senior and independent/ autonomous practitioner.",
-      "requiredEvidenceTypes": [
-        "Annual appraisal & evidence collected for appraisal",
-        "Audit of personal clinical practice",
-        "Evidence of reflective practice & examples",
-        "Job plan",
-        "Multisource feedback",
-        "Patient feedback",
-        "References from colleagues"
+      "description": "Manages the difficulties of dealing with complexity and uncertainty in the care of patients; employing expertise and clinical decision-making skills of a senior and independent/autonomous practitioner.",
+      "minimumRequirements": [
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "patient",
+          "label": "Patient Feedback",
+          "types": [
+            "Patient Feedback"
+          ]
+        },
+        {
+          "id": "reference",
+          "label": "Reference",
+          "types": [
+            "Reference"
+          ]
+        },
+        {
+          "id": "audit",
+          "label": "Audit",
+          "types": [
+            "Audit"
+          ]
+        },
+        {
+          "id": "appraisal",
+          "label": "Appraisal",
+          "types": [
+            "Appraisal"
+          ]
+        }
       ]
     },
     {
       "code": "1.5",
       "domain": 1,
       "description": "Critically reflects on own competence, understands own limits, and seeks help when required.",
-      "requiredEvidenceTypes": [
-        "Annual appraisal & evidence collected for appraisal",
-        "Audit of personal clinical practice",
-        "Evidence of reflective practice & examples",
-        "Job plan",
-        "Multisource feedback",
-        "Patient feedback",
-        "References from colleagues"
+      "minimumRequirements": [
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "patient",
+          "label": "Patient Feedback",
+          "types": [
+            "Patient Feedback"
+          ]
+        },
+        {
+          "id": "reference",
+          "label": "Reference",
+          "types": [
+            "Reference"
+          ]
+        },
+        {
+          "id": "audit",
+          "label": "Audit",
+          "types": [
+            "Audit"
+          ]
+        },
+        {
+          "id": "appraisal",
+          "label": "Appraisal",
+          "types": [
+            "Appraisal"
+          ]
+        }
       ]
     },
     {
       "code": "1.6",
       "domain": 1,
       "description": "Communicates effectively and is able to share decision-making with patients, relatives and carers; treats patients as individuals, promoting a person-centred approach to their care, including self-management.",
-      "requiredEvidenceTypes": [
-        "Annual appraisal & evidence collected for appraisal",
-        "Audit of personal clinical practice",
-        "Evidence of reflective practice & examples",
-        "Job plan",
-        "Multisource feedback",
-        "Patient feedback",
-        "References from colleagues"
+      "minimumRequirements": [
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "patient",
+          "label": "Patient Feedback",
+          "types": [
+            "Patient Feedback"
+          ]
+        },
+        {
+          "id": "reference",
+          "label": "Reference",
+          "types": [
+            "Reference"
+          ]
+        },
+        {
+          "id": "audit",
+          "label": "Audit",
+          "types": [
+            "Audit"
+          ]
+        },
+        {
+          "id": "appraisal",
+          "label": "Appraisal",
+          "types": [
+            "Appraisal"
+          ]
+        }
       ]
     },
     {
       "code": "1.7",
       "domain": 1,
-      "description": "Respects patients’ dignity, ensures confidentiality and appropriate communication where potentially difficult or where barriers exist, e.g. using interpreters and making adjustments for patients with communication difficulties.",
-      "requiredEvidenceTypes": [
-        "Annual appraisal & evidence collected for appraisal",
-        "Audit of personal clinical practice",
-        "EDI training",
-        "Evidence of reflective practice & examples",
-        "Interview",
-        "Job plan",
-        "Multisource feedback",
-        "Patient feedback",
-        "References from colleagues",
-        "Unconscious bias training"
+      "description": "Respects patients' dignity, ensures confidentiality and appropriate communication where potentially difficult or where barriers exist.",
+      "minimumRequirements": [
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "patient",
+          "label": "Patient Feedback",
+          "types": [
+            "Patient Feedback"
+          ]
+        },
+        {
+          "id": "reference",
+          "label": "Reference",
+          "types": [
+            "Reference"
+          ]
+        },
+        {
+          "id": "audit",
+          "label": "Audit",
+          "types": [
+            "Audit"
+          ]
+        },
+        {
+          "id": "appraisal",
+          "label": "Appraisal",
+          "types": [
+            "Appraisal"
+          ]
+        },
+        {
+          "id": "edi",
+          "label": "EDI training",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "EDI training"
+          ]
+        },
+        {
+          "id": "bias",
+          "label": "Unconscious bias training",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "Unconscious bias training"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "1.8",
       "domain": 1,
-      "description": "Demonstrates key generic clinical skills around the areas of consent; ensuring humane interventions, prescribing medicines safely and using medical devices safely",
-      "requiredEvidenceTypes": [
-        "Attendance at relevant courses",
-        "Interview"
+      "description": "Demonstrates key generic clinical skills around consent, humane interventions, safe prescribing and safe use of medical devices.",
+      "minimumRequirements": [
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "patient",
+          "label": "Patient Feedback",
+          "types": [
+            "Patient Feedback"
+          ]
+        },
+        {
+          "id": "reference",
+          "label": "Reference",
+          "types": [
+            "Reference"
+          ]
+        },
+        {
+          "id": "audit",
+          "label": "Audit",
+          "types": [
+            "Audit"
+          ]
+        },
+        {
+          "id": "appraisal",
+          "label": "Appraisal",
+          "types": [
+            "Appraisal"
+          ]
+        },
+        {
+          "id": "course",
+          "label": "Relevant course",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "Accredited or relevant course",
+            "Other relevant learning"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "1.9",
       "domain": 1,
       "description": "Adheres to professional requirements, participating in annual appraisal, job planning and reviews of performance and progression.",
-      "requiredEvidenceTypes": [
-        "Annual appraisal & evidence collected for appraisal"
+      "minimumRequirements": [
+        {
+          "id": "objectives",
+          "label": "Appraisal showing completed objectives",
+          "types": [
+            "Appraisal"
+          ],
+          "appraisalObjectivesCompleted": true
+        }
       ]
     },
     {
       "code": "1.10",
       "domain": 1,
-      "description": "Awareness of legal responsibilities relevant to the role, such as around mental capacity and deprivation of liberty; data protection; equality and diversity.",
-      "requiredEvidenceTypes": [
-        "Attendance at relevant courses",
-        "Interview",
-        "Professional or higher qualifications"
+      "description": "Awareness of legal responsibilities relevant to the role, including mental capacity, deprivation of liberty, data protection, equality and diversity.",
+      "minimumRequirements": [
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        },
+        {
+          "id": "learning",
+          "label": "Learning, course or qualification",
+          "types": [
+            "Course / Learning / Training",
+            "Qualification"
+          ]
+        }
       ]
     },
     {
       "code": "1.11",
       "domain": 1,
-      "description": "Applies basic principles of public health; including population health, promoting health and wellbeing, work, nutrition, exercise, vaccination and illness prevention, as relevant to their specialty",
-      "requiredEvidenceTypes": [
-        "Interview",
-        "Job plan"
+      "description": "Applies basic principles of public health relevant to the specialty.",
+      "minimumRequirements": [
+        {
+          "id": "jobplan",
+          "label": "Scope of Practice / Job Plan",
+          "types": [
+            "Scope of Practice / Job Plan"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "2.1",
       "domain": 2,
-      "description": "Awareness of their leadership responsibilities as a clinician and demonstrates appropriate leadership behaviour; managing situations that are unfamiliar, complex or unpredictable and seeking to build collaboration with, and confidence in, others",
-      "requiredEvidenceTypes": [
-        "Examples of involvement in collaborative leadership work",
-        "Examples of leading change initiatives & new practice",
-        "Interview"
+      "description": "Awareness of leadership responsibilities and demonstrates appropriate leadership behaviour in unfamiliar, complex or unpredictable situations.",
+      "minimumRequirements": [
+        {
+          "id": "change",
+          "label": "Initiative that effected change",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Initiative that effected change"
+          ]
+        },
+        {
+          "id": "collab",
+          "label": "Collaborative leadership work",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Collaborative leadership work"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "2.2",
       "domain": 2,
-      "description": "Demonstrates understanding of a range of leadership principles, approaches and techniques so can adapt leadership behaviours to improve engagement and outcomes – appreciates own leadership style and its impact on others",
-      "requiredEvidenceTypes": [
-        "Evidence of effective leadership",
-        "Leadership courses"
+      "description": "Demonstrates understanding of leadership principles, approaches and techniques and adapts leadership behaviours to improve engagement and outcomes.",
+      "minimumRequirements": [
+        {
+          "id": "leadcourse",
+          "label": "Leadership training",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "Leadership training"
+          ]
+        },
+        {
+          "id": "leadership",
+          "label": "Effective leadership",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Effective leadership"
+          ]
+        }
       ]
     },
     {
       "code": "2.3",
       "domain": 2,
-      "description": "Develops effective relationships across teams and contributes to work and success of these teams – promotes and participates in both multidisciplinary and interprofessional team working.",
-      "requiredEvidenceTypes": [
-        "Evidence of participation in or leading MDT",
-        "Evidence of teamwork",
-        "Interview"
+      "description": "Develops effective relationships across teams and promotes multidisciplinary and interprofessional team working.",
+      "minimumRequirements": [
+        {
+          "id": "mdt",
+          "label": "MDT Evidence",
+          "types": [
+            "MDT Evidence"
+          ]
+        },
+        {
+          "id": "teamwork",
+          "label": "Teamwork",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Teamwork"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "2.4",
       "domain": 2,
-      "description": "Critically reflects on decision-making processes and explains those decisions to others in an honest and transparent way",
-      "requiredEvidenceTypes": []
+      "description": "Critically reflects on decision-making processes and explains decisions honestly and transparently.",
+      "minimumRequirements": [
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
+      ]
     },
     {
       "code": "2.5",
       "domain": 2,
-      "description": "Critically appraises performance of self, colleagues or peers and systems to enhance performance and support development.",
-      "requiredEvidenceTypes": [
-        "Outcome data/audit"
+      "description": "Critically appraises performance of self, colleagues, peers and systems to enhance performance and support development.",
+      "minimumRequirements": [
+        {
+          "id": "success",
+          "label": "Successful situation",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Success"
+          ]
+        }
       ]
     },
     {
       "code": "2.6",
       "domain": 2,
       "description": "Demonstrates ability to challenge others, escalating concerns when necessary.",
-      "requiredEvidenceTypes": [
-        "Interview"
+      "minimumRequirements": [
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "2.7",
       "domain": 2,
-      "description": "Develops practice in response to changing population health need, engaging in horizon scanning for future developments",
-      "requiredEvidenceTypes": [
-        "Interview",
-        "Logbooks"
+      "description": "Develops practice in response to changing population health need and horizon scans for future developments.",
+      "minimumRequirements": [
+        {
+          "id": "logbook",
+          "label": "Logbook",
+          "types": [
+            "Logbook"
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome data or audit",
+          "types": [
+            "Outcome Data",
+            "Audit"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "3.1",
       "domain": 3,
-      "description": "Takes prompt action where there is an issue with the safety or quality of patient care, raises and escalates concerns, through clinical governance systems, where necessary",
-      "requiredEvidenceTypes": [
-        "Evidence of reflective practice & examples",
-        "Examples of involvement (in specified factors)",
-        "Interview",
-        "Involvement in handling outsomes of audits, inquiries, critical incidents or complaints, & implementing change"
+      "description": "Takes prompt action where there is an issue with safety or quality of patient care and raises and escalates concerns through clinical governance systems.",
+      "minimumRequirements": [
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "3.2",
       "domain": 3,
-      "description": "Applies basic human factors principles and practice at individual, team, organisation and system levels",
-      "requiredEvidenceTypes": [
-        "Human Factors course",
-        "Interview",
-        "Multisource feedback"
+      "description": "Applies basic human factors principles and practice at individual, team, organisation and system levels.",
+      "minimumRequirements": [
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        },
+        {
+          "id": "human",
+          "label": "Human Factors training",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "Human Factors training"
+          ]
+        }
       ]
     },
     {
       "code": "3.3",
       "domain": 3,
-      "description": "Collaborates with multidisciplinary and interprofessional teams to manage risk and issues across organisations and settings, with respect for and recognition of the roles of other health professionals.",
-      "requiredEvidenceTypes": [
-        "Interview",
-        "MDT collaborative working",
-        "Multisource feedback"
+      "description": "Collaborates with multidisciplinary and interprofessional teams to manage risk and issues across organisations and settings.",
+      "minimumRequirements": [
+        {
+          "id": "involve",
+          "label": "Example of involvement",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Involvement"
+          ]
+        },
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "3.4",
       "domain": 3,
-      "description": "Advocates for, and contributes to, organisational learning.",
-      "requiredEvidenceTypes": [
-        "Interview"
+      "description": "Advocates for and contributes to organisational learning.",
+      "minimumRequirements": [
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "3.5",
       "domain": 3,
-      "description": "Seeks feedback and involvement from individuals, families, carers, communities and colleagues in safety and quality service improvements reviews.",
-      "requiredEvidenceTypes": [
-        "Multisource feedback",
-        "Patient feedback"
+      "description": "Seeks feedback and involvement from individuals, families, carers, communities and colleagues in safety and quality service improvement reviews.",
+      "minimumRequirements": [
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        },
+        {
+          "id": "patient",
+          "label": "Patient Feedback",
+          "types": [
+            "Patient Feedback"
+          ]
+        }
       ]
     },
     {
       "code": "3.6",
       "domain": 3,
-      "description": "Leads new practice and service redesign in response to feedback, evaluation and need, promoting best practice",
-      "requiredEvidenceTypes": [
-        "Examples of leading change initiatives & new practice"
+      "description": "Leads new practice and service redesign in response to feedback, evaluation and need, promoting best practice.",
+      "minimumRequirements": [
+        {
+          "id": "success",
+          "label": "Example of success",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Success"
+          ]
+        }
       ]
     },
     {
       "code": "3.7",
       "domain": 3,
-      "description": "Evaluates and audits own and others’ clinical practice and acts on the findings.",
-      "requiredEvidenceTypes": [
-        "Examples of leading change initiatives & new practice",
-        "Interview"
+      "description": "Evaluates and audits own and others' clinical practice and acts on the findings.",
+      "minimumRequirements": [
+        {
+          "id": "change",
+          "label": "Successful change",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Successful change"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "3.8",
       "domain": 3,
       "description": "Reflects on personal behaviour and practice, responding to learning opportunities.",
-      "requiredEvidenceTypes": [
-        "Evidence of reflective practice & examples",
-        "Interview"
+      "minimumRequirements": [
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "3.9",
       "domain": 3,
-      "description": "Implements quality improvement methods and repeats quality improvement cycles to refine practice; designing projects and evaluating their impact.",
-      "requiredEvidenceTypes": [
-        "Attendance at QI training",
-        "Clinical Audit projects",
-        "QI projects"
+      "description": "Implements quality improvement methods and repeats quality improvement cycles to refine practice, designing projects and evaluating impact.",
+      "minimumRequirements": [
+        {
+          "id": "audit",
+          "label": "Audit",
+          "types": [
+            "Audit"
+          ]
+        },
+        {
+          "id": "qi",
+          "label": "Quality Improvement Project",
+          "types": [
+            "Quality Improvement Project"
+          ]
+        },
+        {
+          "id": "qitraining",
+          "label": "Quality Improvement training",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "Quality Improvement training"
+          ]
+        }
       ]
     },
     {
       "code": "3.10",
       "domain": 3,
-      "description": "Critically appraises and synthesises the outcomes of audit, inquiries, critical incidents or complaints and implements appropriate changes",
-      "requiredEvidenceTypes": [
-        "Interview"
+      "description": "Critically appraises and synthesises outcomes of audit, inquiries, critical incidents or complaints and implements appropriate changes.",
+      "minimumRequirements": [
+        {
+          "id": "involve",
+          "label": "Example of involvement",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Involvement"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "3.11",
       "domain": 3,
       "description": "Engages with relevant stakeholders to develop and implement robust governance systems and systematic documentation processes.",
-      "requiredEvidenceTypes": [
-        "Evidence of developing & implementing robust governance systems & systematic documentation processes with stakeholders",
-        "Evidence of reflective practice & examples",
-        "Examples of involvement (in specified factors)",
-        "Interview",
-        "Involvement in handling outsomes of audits, inquiries, critical incidents or complaints, & implementing change",
-        "Multisource feedback"
+      "minimumRequirements": [
+        {
+          "id": "involve",
+          "label": "Example of involvement",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Involvement"
+          ]
+        },
+        {
+          "id": "msf",
+          "label": "Multisource Feedback",
+          "types": [
+            "Multisource Feedback"
+          ]
+        }
       ]
     },
     {
       "code": "4.1",
       "domain": 4,
-      "description": "Recognises and takes responsibility for safeguarding children, young people and adults, using appropriate systems for identifying, sharing information, recording and raising concerns, obtaining advice and taking action.",
-      "requiredEvidenceTypes": [
-        "Interview",
-        "Safeguarding courses (including dates)"
+      "description": "Recognises and takes responsibility for safeguarding children, young people and adults.",
+      "minimumRequirements": [
+        {
+          "id": "safe",
+          "label": "Safeguarding training",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "Safeguarding training"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "4.2",
       "domain": 4,
-      "description": "Applies appropriate equality and diversity legislation, including disability discrimination requirements, in the context of patient care.",
-      "requiredEvidenceTypes": [
-        "EDI training",
-        "Interview"
+      "description": "Applies appropriate equality and diversity legislation, including disability discrimination requirements, in patient care.",
+      "minimumRequirements": [
+        {
+          "id": "edi",
+          "label": "EDI training",
+          "types": [
+            "Course / Learning / Training"
+          ],
+          "subtypes": [
+            "EDI training"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "5.1",
       "domain": 5,
-      "description": "Critically assesses own learning needs and ensures a personal development plan reflects both clinical practice and the relevant generic capabilities to lead and develop services",
-      "requiredEvidenceTypes": [
-        "Audit of personal clinical practice",
-        "Examples of success (in specified factors)",
-        "Interview"
+      "description": "Critically assesses own learning needs and ensures a personal development plan reflects clinical practice and relevant generic capabilities.",
+      "minimumRequirements": [
+        {
+          "id": "audit",
+          "label": "Audit",
+          "types": [
+            "Audit"
+          ]
+        },
+        {
+          "id": "success",
+          "label": "Example of success",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Success"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "5.2",
       "domain": 5,
-      "description": "Promotes and participates in individual and team learning; supporting the educational needs of individuals and teams for uni-professional, multidisciplinary and interprofessional learning",
-      "requiredEvidenceTypes": [
-        "Evidence of teaching & training of medical/dental students, trainees, or AHP's",
-        "Examples of involvement (in specified factors)",
-        "Outcome data/audit"
+      "description": "Promotes and participates in individual and team learning and supports educational needs across professional groups.",
+      "minimumRequirements": [
+        {
+          "id": "teach",
+          "label": "Teaching or training evidence",
+          "types": [
+            "Teaching / Training Evidence"
+          ],
+          "subtypes": [
+            "Teaching students",
+            "Teaching doctors or dentists in training",
+            "Teaching allied health professionals",
+            "Team or multidisciplinary learning"
+          ]
+        },
+        {
+          "id": "involve",
+          "label": "Example of involvement",
+          "types": [
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Involvement"
+          ]
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome data or audit",
+          "types": [
+            "Outcome Data",
+            "Audit"
+          ]
+        }
       ]
     },
     {
       "code": "5.3",
       "domain": 5,
       "description": "Identifies and creates safe and supportive working and learning environments.",
-      "requiredEvidenceTypes": [
-        "Examples of success (in specified factors)",
-        "Examples of using clinical guidelines",
-        "Knowledge & awareness of guidelines"
+      "minimumRequirements": [
+        {
+          "id": "guideline",
+          "label": "Guideline awareness",
+          "types": [
+            "Guideline Evidence"
+          ],
+          "subtypes": [
+            "Guideline awareness"
+          ]
+        }
       ]
     },
     {
       "code": "5.4",
       "domain": 5,
       "description": "Can act as a role model, educator, supervisor, coach or mentor for medical and non-medical practitioners.",
-      "requiredEvidenceTypes": [
-        "Evidence as role model, educator, supervisor, coach or mentor (med. or non-med)"
+      "minimumRequirements": [
+        {
+          "id": "role",
+          "label": "Role model, educator, supervisor, coach or mentor",
+          "types": [
+            "Teaching / Training Evidence"
+          ],
+          "subtypes": [
+            "Role-model activity",
+            "Supervision",
+            "Coaching or mentoring",
+            "Teaching experience"
+          ]
+        }
       ]
     },
     {
       "code": "5.5",
       "domain": 5,
-      "description": "Creates effective learning opportunities and provides developmental feedback, both verbally and in writing, to learners and doctors/dentists in training, as required by the role.",
-      "requiredEvidenceTypes": [
-        "Evidence of teaching & training of medical/dental students, trainees, or AHP's",
-        "Examples of success (in specified factors)",
-        "Interview"
+      "description": "Creates effective learning opportunities and provides developmental feedback to learners and doctors or dentists in training.",
+      "minimumRequirements": [
+        {
+          "id": "success",
+          "label": "Teaching success",
+          "types": [
+            "Teaching / Training Evidence"
+          ],
+          "subtypes": [
+            "Teaching success"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "5.6",
       "domain": 5,
       "description": "Plans and provides effective teaching and training activities as required by the role.",
-      "requiredEvidenceTypes": [
-        "Examples of success (in specified factors)"
+      "minimumRequirements": [
+        {
+          "id": "experience",
+          "label": "Teaching experience",
+          "types": [
+            "Teaching / Training Evidence"
+          ],
+          "subtypes": [
+            "Teaching experience"
+          ]
+        }
       ]
     },
     {
       "code": "5.7",
       "domain": 5,
-      "description": "Understands how to raise concerns about the behaviour or performance of any learner who is under their clinical supervision (leadership)",
-      "requiredEvidenceTypes": [
-        "Examples of successful interventions after raising concerns about a learner under your clinical supervision (leadership)",
-        "Interview"
+      "description": "Understands how to raise concerns about the behaviour or performance of a learner under clinical supervision.",
+      "minimumRequirements": [
+        {
+          "id": "intervention",
+          "label": "Successful learner intervention",
+          "types": [
+            "Teaching / Training Evidence"
+          ],
+          "subtypes": [
+            "Successful learner intervention"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "5.8",
       "domain": 5,
       "description": "Takes part in patient education.",
-      "requiredEvidenceTypes": [
-        "Examples of patient education",
-        "Patient feedback"
+      "minimumRequirements": [
+        {
+          "id": "patientedu",
+          "label": "Patient education",
+          "types": [
+            "Teaching / Training Evidence"
+          ],
+          "subtypes": [
+            "Patient education"
+          ]
+        },
+        {
+          "id": "patient",
+          "label": "Patient Feedback",
+          "types": [
+            "Patient Feedback"
+          ]
+        }
       ]
     },
     {
       "code": "6.1",
       "domain": 6,
-      "description": "Up-to-date with current research and best practice in the individual’s specific area of practice, through appropriate continuing professional development activities and their own independent study and reflection.",
-      "requiredEvidenceTypes": [
-        "CPD diary & reflections"
+      "description": "Keeps up to date with current research and best practice through CPD, independent study and reflection.",
+      "minimumRequirements": [
+        {
+          "id": "cpd",
+          "label": "CPD Diary",
+          "types": [
+            "CPD Diary"
+          ]
+        }
       ]
     },
     {
       "code": "6.2",
       "domain": 6,
-      "description": "Critically appraises and understands the relevance of the literature, conducting literature searches and reviews; disseminates best practice including from quality improvement projects",
-      "requiredEvidenceTypes": [
-        "Interview",
-        "Participation in research training courses or recruitment for NIHR research studies",
-        "Presentation/publication of conference abstract",
-        "Publications, including guideline development",
-        "Reviewer of papers/ conference abstracts"
+      "description": "Critically appraises literature, conducts searches and reviews, and disseminates best practice including from quality improvement projects.",
+      "minimumRequirements": [
+        {
+          "id": "research",
+          "label": "Research training or NIHR recruitment",
+          "types": [
+            "Course / Learning / Training",
+            "Research Activity"
+          ],
+          "subtypes": [
+            "Research training",
+            "NIHR study recruitment"
+          ]
+        },
+        {
+          "id": "abstract",
+          "label": "Conference presentation or abstract",
+          "types": [
+            "Presentation / Publication"
+          ],
+          "subtypes": [
+            "Conference presentation",
+            "Conference abstract"
+          ]
+        },
+        {
+          "id": "peer",
+          "label": "Peer Review Activity",
+          "types": [
+            "Peer Review Activity"
+          ]
+        },
+        {
+          "id": "publication",
+          "label": "Publication or guideline development",
+          "types": [
+            "Presentation / Publication",
+            "Guideline Evidence"
+          ],
+          "subtypes": [
+            "Publication",
+            "Guideline development"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "6.3",
       "domain": 6,
       "description": "Locates and uses clinical guidelines appropriately.",
-      "requiredEvidenceTypes": [
-        "Examples of using clinical guidelines",
-        "Interview",
-        "Knowledge & awareness of guidelines"
+      "minimumRequirements": [
+        {
+          "id": "guidelines",
+          "label": "Use of guidelines in clinical practice",
+          "types": [
+            "Guideline Evidence"
+          ],
+          "subtypes": [
+            "Use in clinical practice"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     },
     {
       "code": "6.4",
       "domain": 6,
-      "description": "Communicates and interprets research evidence in a meaningful way for patients to support shared decision-making.",
-      "requiredEvidenceTypes": [
-        "Examples of implementation of evidence-based change"
+      "description": "Communicates and interprets research evidence meaningfully for patients to support shared decision-making.",
+      "minimumRequirements": [
+        {
+          "id": "change",
+          "label": "Implementation of evidence-based change",
+          "types": [
+            "Guideline Evidence",
+            "Workplace Example"
+          ],
+          "subtypes": [
+            "Implementation of evidence-based change",
+            "Evidence-based change"
+          ]
+        }
       ]
     },
     {
       "code": "6.5",
       "domain": 6,
-      "description": "Works towards identifying the need for further research to strengthen the evidence base or where there are gaps in knowledge, networking with teams within and outside the organisation",
-      "requiredEvidenceTypes": [
-        "Evidence of research activities and knowledge of current limitations in evidence",
-        "Interview"
+      "description": "Works towards identifying research needs and gaps in knowledge, networking within and outside the organisation.",
+      "minimumRequirements": [
+        {
+          "id": "research",
+          "label": "Research Activity",
+          "types": [
+            "Research Activity"
+          ]
+        },
+        {
+          "id": "interview",
+          "label": "Interview",
+          "types": [
+            "Interview"
+          ]
+        }
       ]
     }
   ],
   "evidenceTypes": [
     {
-      "id": "Interview",
+      "id": "Appraisal",
       "order": 1,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        1
+      ],
+      "suggestedCriteria": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8",
+        "1.9"
+      ]
+    },
+    {
+      "id": "Scope of Practice / Job Plan",
+      "order": 2,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        1
+      ],
+      "suggestedCriteria": [
+        "1.2",
+        "1.11"
+      ]
+    },
+    {
+      "id": "Logbook",
+      "order": 3,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        1,
+        2
+      ],
+      "suggestedCriteria": [
+        "1.2",
+        "2.7"
+      ]
+    },
+    {
+      "id": "Audit",
+      "order": 4,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "suggestedCriteria": [
+        "1.2",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8",
+        "2.7",
+        "3.9",
+        "5.1",
+        "5.2"
+      ]
+    },
+    {
+      "id": "Quality Improvement Project",
+      "order": 5,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        3
+      ],
+      "suggestedCriteria": [
+        "3.9"
+      ]
+    },
+    {
+      "id": "Outcome Data",
+      "order": 6,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        2,
+        5
+      ],
+      "suggestedCriteria": [
+        "2.7",
+        "5.2"
+      ]
+    },
+    {
+      "id": "Multisource Feedback",
+      "order": 7,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        1,
+        3
+      ],
+      "suggestedCriteria": [
+        "1.1",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8",
+        "3.2",
+        "3.3",
+        "3.5",
+        "3.11"
+      ]
+    },
+    {
+      "id": "Patient Feedback",
+      "order": 8,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        1,
+        3,
+        5
+      ],
+      "suggestedCriteria": [
+        "1.1",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8",
+        "3.5",
+        "5.8"
+      ]
+    },
+    {
+      "id": "Reference",
+      "order": 9,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        1
+      ],
+      "suggestedCriteria": [
+        "1.2",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8"
+      ]
+    },
+    {
+      "id": "Interview",
+      "order": 10,
+      "secondaryOptions": [],
       "suggestedDomains": [
         1,
         2,
@@ -545,6 +1510,7 @@ const APP_DATA = {
         "1.11",
         "2.1",
         "2.3",
+        "2.4",
         "2.6",
         "2.7",
         "3.1",
@@ -554,7 +1520,6 @@ const APP_DATA = {
         "3.7",
         "3.8",
         "3.10",
-        "3.11",
         "4.1",
         "4.2",
         "5.1",
@@ -566,166 +1531,45 @@ const APP_DATA = {
       ]
     },
     {
-      "id": "Job plan",
-      "order": 2,
-      "suggestedDomains": [
-        1
-      ],
-      "suggestedCriteria": [
-        "1.2",
-        "1.3",
-        "1.4",
-        "1.5",
-        "1.6",
-        "1.7",
-        "1.11"
-      ]
-    },
-    {
-      "id": "Annual appraisal & evidence collected for appraisal",
-      "order": 3,
-      "suggestedDomains": [
-        1
-      ],
-      "suggestedCriteria": [
-        "1.1",
-        "1.3",
-        "1.4",
-        "1.5",
-        "1.6",
-        "1.7",
-        "1.9"
-      ]
-    },
-    {
-      "id": "Multisource feedback",
-      "order": 4,
-      "suggestedDomains": [
-        1,
-        3
-      ],
-      "suggestedCriteria": [
-        "1.1",
-        "1.2",
-        "1.3",
-        "1.4",
-        "1.5",
-        "1.6",
-        "1.7",
-        "3.2",
-        "3.3",
-        "3.5",
-        "3.11"
-      ]
-    },
-    {
-      "id": "Patient feedback",
-      "order": 5,
-      "suggestedDomains": [
-        1,
-        3,
-        5
-      ],
-      "suggestedCriteria": [
-        "1.1",
-        "1.2",
-        "1.3",
-        "1.4",
-        "1.5",
-        "1.6",
-        "1.7",
-        "3.5",
-        "5.8"
-      ]
-    },
-    {
-      "id": "References from colleagues",
-      "order": 6,
-      "suggestedDomains": [
-        1
-      ],
-      "suggestedCriteria": [
-        "1.2",
-        "1.3",
-        "1.4",
-        "1.5",
-        "1.6",
-        "1.7"
-      ]
-    },
-    {
-      "id": "Mandatory training (UK Core Skills Training Framework)",
-      "order": 7,
-      "suggestedDomains": [
-        1
-      ],
-      "suggestedCriteria": [
-        "1.1"
-      ]
-    },
-    {
-      "id": "Logbooks",
-      "order": 8,
-      "suggestedDomains": [
-        1,
-        2
-      ],
-      "suggestedCriteria": [
-        "1.2",
-        "2.7"
-      ]
-    },
-    {
-      "id": "Audit of personal clinical practice",
-      "order": 9,
-      "suggestedDomains": [
-        1,
-        5
-      ],
-      "suggestedCriteria": [
-        "1.2",
-        "1.3",
-        "1.4",
-        "1.5",
-        "1.6",
-        "1.7",
-        "5.1"
-      ]
-    },
-    {
-      "id": "Evidence of reflective practice & examples",
-      "order": 10,
-      "suggestedDomains": [
-        1,
-        3
-      ],
-      "suggestedCriteria": [
-        "1.2",
-        "1.3",
-        "1.4",
-        "1.5",
-        "1.6",
-        "1.7",
-        "3.1",
-        "3.8",
-        "3.11"
-      ]
-    },
-    {
-      "id": "Attendance at relevant courses",
+      "id": "Course / Learning / Training",
       "order": 11,
+      "secondaryOptions": [
+        "Mandatory training",
+        "Safeguarding training",
+        "EDI training",
+        "Unconscious bias training",
+        "Human Factors training",
+        "Quality Improvement training",
+        "Leadership training",
+        "Research training",
+        "Accredited or relevant course",
+        "Other relevant learning"
+      ],
       "suggestedDomains": [
-        1
+        1,
+        2,
+        3,
+        4,
+        6
       ],
       "suggestedCriteria": [
+        "1.1",
         "1.2",
+        "1.7",
         "1.8",
-        "1.10"
+        "1.10",
+        "2.2",
+        "3.2",
+        "3.9",
+        "4.1",
+        "4.2",
+        "6.2"
       ]
     },
     {
-      "id": "CPD diary & reflections",
+      "id": "CPD Diary",
       "order": 12,
+      "secondaryOptions": [],
       "suggestedDomains": [
         1,
         6
@@ -736,8 +1580,9 @@ const APP_DATA = {
       ]
     },
     {
-      "id": "Professional or higher qualifications",
+      "id": "Qualification",
       "order": 13,
+      "secondaryOptions": [],
       "suggestedDomains": [
         1
       ],
@@ -747,334 +1592,157 @@ const APP_DATA = {
       ]
     },
     {
-      "id": "EDI training",
+      "id": "Workplace Example",
       "order": 14,
-      "suggestedDomains": [
-        1,
-        4
+      "secondaryOptions": [
+        "Initiative that effected change",
+        "Collaborative leadership work",
+        "Effective leadership",
+        "Teamwork",
+        "Involvement",
+        "Success",
+        "Successful change",
+        "Successful intervention",
+        "Evidence-based change",
+        "Use of guidelines in clinical practice",
+        "Patient education"
       ],
-      "suggestedCriteria": [
-        "1.7",
-        "4.2"
-      ]
-    },
-    {
-      "id": "Unconscious bias training",
-      "order": 15,
-      "suggestedDomains": [
-        1
-      ],
-      "suggestedCriteria": [
-        "1.7"
-      ]
-    },
-    {
-      "id": "Examples of leading change initiatives & new practice",
-      "order": 16,
       "suggestedDomains": [
         2,
-        3
+        3,
+        5,
+        6
       ],
       "suggestedCriteria": [
         "2.1",
-        "3.6",
-        "3.7"
-      ]
-    },
-    {
-      "id": "Examples of involvement in collaborative leadership work",
-      "order": 17,
-      "suggestedDomains": [
-        2
-      ],
-      "suggestedCriteria": [
-        "2.1"
-      ]
-    },
-    {
-      "id": "Leadership courses",
-      "order": 18,
-      "suggestedDomains": [
-        2
-      ],
-      "suggestedCriteria": [
-        "2.2"
-      ]
-    },
-    {
-      "id": "Evidence of effective leadership",
-      "order": 19,
-      "suggestedDomains": [
-        2
-      ],
-      "suggestedCriteria": [
-        "2.2"
-      ]
-    },
-    {
-      "id": "Evidence of participation in or leading MDT",
-      "order": 20,
-      "suggestedDomains": [
-        2
-      ],
-      "suggestedCriteria": [
-        "2.3"
-      ]
-    },
-    {
-      "id": "Evidence of teamwork",
-      "order": 21,
-      "suggestedDomains": [
-        2
-      ],
-      "suggestedCriteria": [
-        "2.3"
-      ]
-    },
-    {
-      "id": "Outcome data/audit",
-      "order": 22,
-      "suggestedDomains": [
-        2,
-        5
-      ],
-      "suggestedCriteria": [
+        "2.2",
+        "2.3",
         "2.5",
-        "5.2"
-      ]
-    },
-    {
-      "id": "Human Factors course",
-      "order": 23,
-      "suggestedDomains": [
-        3
-      ],
-      "suggestedCriteria": [
-        "3.2"
-      ]
-    },
-    {
-      "id": "MDT collaborative working",
-      "order": 24,
-      "suggestedDomains": [
-        3
-      ],
-      "suggestedCriteria": [
-        "3.3"
-      ]
-    },
-    {
-      "id": "Clinical Audit projects",
-      "order": 25,
-      "suggestedDomains": [
-        3
-      ],
-      "suggestedCriteria": [
-        "3.9"
-      ]
-    },
-    {
-      "id": "QI projects",
-      "order": 26,
-      "suggestedDomains": [
-        3
-      ],
-      "suggestedCriteria": [
-        "3.9"
-      ]
-    },
-    {
-      "id": "Attendance at QI training",
-      "order": 27,
-      "suggestedDomains": [
-        3
-      ],
-      "suggestedCriteria": [
-        "3.9"
-      ]
-    },
-    {
-      "id": "Involvement in handling outsomes of audits, inquiries, critical incidents or complaints, & implementing change",
-      "order": 28,
-      "suggestedDomains": [
-        3
-      ],
-      "suggestedCriteria": [
-        "3.1",
-        "3.11"
-      ]
-    },
-    {
-      "id": "Evidence of developing & implementing robust governance systems & systematic documentation processes with stakeholders",
-      "order": 29,
-      "suggestedDomains": [
-        3
-      ],
-      "suggestedCriteria": [
-        "3.11"
-      ]
-    },
-    {
-      "id": "Safeguarding courses (including dates)",
-      "order": 30,
-      "suggestedDomains": [
-        4
-      ],
-      "suggestedCriteria": [
-        "4.1"
-      ]
-    },
-    {
-      "id": "Examples of success (in specified factors)",
-      "order": 31,
-      "suggestedDomains": [
-        5
-      ],
-      "suggestedCriteria": [
-        "5.1",
-        "5.3",
-        "5.5",
-        "5.6"
-      ]
-    },
-    {
-      "id": "Examples of involvement (in specified factors)",
-      "order": 32,
-      "suggestedDomains": [
-        3,
-        5
-      ],
-      "suggestedCriteria": [
-        "3.1",
+        "3.3",
+        "3.6",
+        "3.7",
+        "3.10",
         "3.11",
-        "5.2"
+        "5.1",
+        "5.2",
+        "6.4"
       ]
     },
     {
-      "id": "Evidence of teaching & training of medical/dental students, trainees, or AHP's",
-      "order": 33,
+      "id": "MDT Evidence",
+      "order": 15,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        2
+      ],
+      "suggestedCriteria": [
+        "2.3"
+      ]
+    },
+    {
+      "id": "Teaching / Training Evidence",
+      "order": 16,
+      "secondaryOptions": [
+        "Teaching students",
+        "Teaching doctors or dentists in training",
+        "Teaching allied health professionals",
+        "Team or multidisciplinary learning",
+        "Teaching experience",
+        "Teaching success",
+        "Learner feedback",
+        "Developmental feedback",
+        "Supervision",
+        "Coaching or mentoring",
+        "Role-model activity",
+        "Successful learner intervention",
+        "Patient education"
+      ],
       "suggestedDomains": [
         5
       ],
       "suggestedCriteria": [
         "5.2",
-        "5.5"
-      ]
-    },
-    {
-      "id": "Knowledge & awareness of guidelines",
-      "order": 34,
-      "suggestedDomains": [
-        5,
-        6
-      ],
-      "suggestedCriteria": [
-        "5.3",
-        "6.3"
-      ]
-    },
-    {
-      "id": "Examples of using clinical guidelines",
-      "order": 35,
-      "suggestedDomains": [
-        5,
-        6
-      ],
-      "suggestedCriteria": [
-        "5.3",
-        "6.3"
-      ]
-    },
-    {
-      "id": "Evidence as role model, educator, supervisor, coach or mentor (med. or non-med)",
-      "order": 36,
-      "suggestedDomains": [
-        5
-      ],
-      "suggestedCriteria": [
-        "5.4"
-      ]
-    },
-    {
-      "id": "Examples of successful interventions after raising concerns about a learner under your clinical supervision (leadership)",
-      "order": 37,
-      "suggestedDomains": [
-        5
-      ],
-      "suggestedCriteria": [
-        "5.7"
-      ]
-    },
-    {
-      "id": "Examples of patient education",
-      "order": 38,
-      "suggestedDomains": [
-        5
-      ],
-      "suggestedCriteria": [
+        "5.4",
+        "5.5",
+        "5.6",
+        "5.7",
         "5.8"
       ]
     },
     {
-      "id": "Participation in research training courses or recruitment for NIHR research studies",
-      "order": 39,
+      "id": "Guideline Evidence",
+      "order": 17,
+      "secondaryOptions": [
+        "Guideline awareness",
+        "Use in clinical practice",
+        "Guideline development",
+        "Implementation of evidence-based change"
+      ],
       "suggestedDomains": [
+        5,
         6
       ],
       "suggestedCriteria": [
-        "6.2"
-      ]
-    },
-    {
-      "id": "Presentation/publication of conference abstract",
-      "order": 40,
-      "suggestedDomains": [
-        6
-      ],
-      "suggestedCriteria": [
-        "6.2"
-      ]
-    },
-    {
-      "id": "Reviewer of papers/ conference abstracts",
-      "order": 41,
-      "suggestedDomains": [
-        6
-      ],
-      "suggestedCriteria": [
-        "6.2"
-      ]
-    },
-    {
-      "id": "Publications, including guideline development",
-      "order": 42,
-      "suggestedDomains": [
-        6
-      ],
-      "suggestedCriteria": [
-        "6.2"
-      ]
-    },
-    {
-      "id": "Examples of implementation of evidence-based change",
-      "order": 43,
-      "suggestedDomains": [
-        6
-      ],
-      "suggestedCriteria": [
+        "5.3",
+        "6.2",
+        "6.3",
         "6.4"
       ]
     },
     {
-      "id": "Evidence of research activities and knowledge of current limitations in evidence",
-      "order": 44,
+      "id": "Research Activity",
+      "order": 18,
+      "secondaryOptions": [
+        "Participation in research",
+        "NIHR study recruitment",
+        "Research project",
+        "Current limitations in evidence",
+        "Research needs or evidence gaps",
+        "Research collaboration or networking"
+      ],
       "suggestedDomains": [
         6
       ],
       "suggestedCriteria": [
+        "6.2",
         "6.5"
+      ]
+    },
+    {
+      "id": "Presentation / Publication",
+      "order": 19,
+      "secondaryOptions": [
+        "Conference presentation",
+        "Conference abstract",
+        "Publication",
+        "Guideline development"
+      ],
+      "suggestedDomains": [
+        6
+      ],
+      "suggestedCriteria": [
+        "6.2"
+      ]
+    },
+    {
+      "id": "Peer Review Activity",
+      "order": 20,
+      "secondaryOptions": [],
+      "suggestedDomains": [
+        6
+      ],
+      "suggestedCriteria": [
+        "6.2"
       ]
     }
   ],
+  "scoring": {
+    "minimumWeight": 70,
+    "strengthWeight": 30,
+    "darkGreenStrengthPoints": 2,
+    "newTypePoints": 1,
+    "repeatTypePoints": 0.5,
+    "repeatTypeCap": 1
+  },
   "totalCriteria": 44
 };
