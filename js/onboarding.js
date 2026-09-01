@@ -1048,6 +1048,110 @@ downloadLink.addEventListener(
     }
 }
 
+async function createAutomaticBackupDownload() {
+    if (typeof DB === "undefined" || typeof DB.all !== "function") {
+        throw new Error("The portfolio database is not available.");
+    }
+    const records = await DB.all();
+    const migratedEvidence = [];
+    for (const evidenceItem of records) {
+        const migratedItem = { ...evidenceItem };
+        if (evidenceItem.file instanceof Blob) {
+            migratedItem.fileData = await fileToDataUrl(evidenceItem.file);
+            migratedItem.fileName = evidenceItem.fileName || `evidence_${evidenceItem.id}`;
+            migratedItem.fileType = evidenceItem.file.type || "application/octet-stream";
+            delete migratedItem.file;
+        }
+        if (evidenceItem.reflectionFile instanceof Blob) {
+            migratedItem.reflectionFileData = await fileToDataUrl(evidenceItem.reflectionFile);
+            migratedItem.reflectionFileName = evidenceItem.reflectionFileName || `reflection_${evidenceItem.id}`;
+            migratedItem.reflectionFileType = evidenceItem.reflectionFile.type || "application/octet-stream";
+            delete migratedItem.reflectionFile;
+        }
+        migratedEvidence.push(migratedItem);
+    }
+    const createdAt = new Date().toISOString();
+    const migration = {
+        format: "NIMDTA-SPB-MIGRATION",
+        migrationVersion: 1,
+        appVersion: APP_VERSION,
+        createdAt,
+        settings: { ...settings },
+        profile: { ...readProfile() },
+        interviewPlans: JSON.parse(localStorage.getItem("spbInterviewPlans") || "{}"),
+        evidence: migratedEvidence
+    };
+    const blob = new Blob([JSON.stringify(migration)], { type: "application/json;charset=utf-8" });
+    if (!blob.size) throw new Error("The backup file was empty.");
+    const date = createdAt.slice(0, 10);
+    const time = createdAt.slice(11, 16).replace(":", "-");
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = `Specialist_Portfolio_Backup_${date}_${time}.spb`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+    settings.lastMigrationAt = createdAt;
+    settings.lastAutomaticBackupAt = createdAt;
+    settings.changesSinceBackup = 0;
+    settings.backupReminderDeferredAt = null;
+    saveSettings();
+    return { count: records.length, size: blob.size };
+}
+function backupIsDue() {
+    const changes = Number(settings.changesSinceBackup || 0);
+    if (changes <= 0) return false;
+    if (!settings.lastAutomaticBackupAt && !settings.lastMigrationAt) return true;
+    if (changes >= 10) return true;
+    const last = new Date(settings.lastAutomaticBackupAt || settings.lastMigrationAt).getTime();
+    return Number.isFinite(last) && Date.now() - last >= 30 * 24 * 60 * 60 * 1000;
+}
+function showAutomaticBackupReminder() {
+    if (!backupIsDue() || document.getElementById("spbAutomaticBackupNow")) return;
+    showModal(`
+        <h2>Protect your portfolio</h2>
+        <div class="spb-warning">
+            <b>Download a backup to this device</b>
+            <p>Your working portfolio is stored in browser storage. Clearing browser or site data can remove it.</p>
+        </div>
+        <p>Download a restorable Portfolio Builder backup now and save it somewhere secure on this device or an approved drive.</p>
+        <div class="spb-actions">
+            <button type="button" id="spbAutomaticBackupLater" class="spb-ghost">Remind Me Later</button>
+            <button type="button" id="spbAutomaticBackupNow" class="spb-primary">Download Backup Now</button>
+        </div>
+    `, false);
+    document.getElementById("spbAutomaticBackupLater").addEventListener("click", function () {
+        settings.backupReminderDeferredAt = new Date().toISOString();
+        saveSettings();
+        closeModal(true);
+    }, { once: true });
+    document.getElementById("spbAutomaticBackupNow").addEventListener("click", async function () {
+        const button = this;
+        button.disabled = true;
+        button.textContent = "Preparing Backup...";
+        try {
+            const result = await createAutomaticBackupDownload();
+            closeModal(true);
+            window.alert(`Backup downloaded to this device.\n\nEvidence items: ${result.count}`);
+        } catch (error) {
+            console.error("Automatic backup failed:", error);
+            button.disabled = false;
+            button.textContent = "Download Backup Now";
+            window.alert("The backup could not be downloaded.\n\n" + (error.message || "An unknown error occurred."));
+        }
+    }, { once: true });
+}
+window.SPBAutoBackup = {
+    noteChange: function () {
+        settings.changesSinceBackup = Number(settings.changesSinceBackup || 0) + 1;
+        saveSettings();
+        window.setTimeout(showAutomaticBackupReminder, 250);
+    },
+    downloadNow: createAutomaticBackupDownload,
+    showIfDue: showAutomaticBackupReminder
+};
 function showMigration() {
     showModal(
         `
