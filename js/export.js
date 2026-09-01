@@ -576,95 +576,120 @@ async function makeZip(files) {
     return new Blob([body, central, end], { type: "application/zip" });
 }
 
-async function buildIndexedHtml(items, names, reflectionNames) {
+function indexedAnchor(item, index) {
+    return "evidence_" + String(index + 1) + "_" + String(item.id).replace(/[^A-Za-z0-9_-]/g, "_");
+}
+async function uploadedReflectionText(item) {
+    if (!item.reflectionFile) return "";
+    const extension = fileExtension(item.reflectionFileName);
+    if (extension === ".txt" || item.reflectionFile.type === "text/plain") {
+        return await item.reflectionFile.text();
+    }
+    if (extension === ".docx" || item.reflectionFile.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+        await ensureMammothLibrary();
+        const result = await mammoth.extractRawText({ arrayBuffer: await item.reflectionFile.arrayBuffer() });
+        return result.value || "";
+    }
+    return "The uploaded reflection could not be inserted because it is not a supported text-based reflection file.";
+}
+function portableEvidenceHref(fileName) {
+    return "Evidence/" + String(fileName || "")
+        .replace(/\\/g, "/")
+        .split("/")
+        .map(segment => encodeURIComponent(segment))
+        .join("/");
+}
+function htmlParagraphs(value) {
+    return String(value || "")
+        .split(/\r?\n+/)
+        .map(cleanText)
+        .filter(Boolean)
+        .map(paragraph => `<p>${esc(paragraph)}</p>`)
+        .join("");
+}
+async function buildIndexedHtml(items, names) {
     const profile = JSON.parse(localStorage.getItem("portfolioProfile") || "{}");
     const sortedItems = sortEvidence(items);
-    let contents = "<h1>Contents</h1><ul>";
-    sortedItems.forEach(item => {
-        contents += `<li><a href="#ev${item.id}">${esc(item.title)}</a></li>`;
+    const anchors = {};
+    sortedItems.forEach((item, index) => {
+        anchors[item.id] = indexedAnchor(item, index);
     });
-    contents += "</ul>";
+    const pageBreak = '<br clear="all" style="mso-special-character:line-break;page-break-before:always">';
+
+    let contents = '<a name="contents" id="contents"></a><h1>Contents</h1><ul>';
+    sortedItems.forEach(item => {
+        contents += `<li><a href="#${anchors[item.id]}">${esc(item.title)}</a></li>`;
+    });
+    contents += '</ul><p><a href="#domainCriterionIndex">Go to Domain and Criterion Index</a></p>';
 
     let body = "";
-    sortedItems.forEach(item => {
-        body += `<h1 id="ev${item.id}">${esc(item.title)}</h1>`;
-        body += `<p><b>Date:</b> ${esc(fmtDate(item.date) || "Date not entered")}</p>`;
-        body += "<h2>Evidence type</h2><ul>";
+    for (const item of sortedItems) {
+        body += pageBreak;
+        body += `<a name="${anchors[item.id]}" id="${anchors[item.id]}"></a>`;
+        body += '<div class="evidence-section">';
+        body += `<h1>${esc(item.title)}</h1>`;
+        body += `<p><b>Evidence date:</b> ${esc(fmtDate(item.date) || "Date not entered")}</p>`;
+        body += '<h2>Evidence type</h2><ul>';
         body += `<li>${esc(item.evidenceType || (item.evidenceTypes || [])[0] || "Not recorded")}</li>`;
         body += (item.evidenceSubtypes || []).map(value => `<li>${esc(value)}</li>`).join("");
-        body += "</ul>";
-        if (item.appraisalObjectivesCompleted) body += "<p><b>This appraisal shows completed objectives.</b></p>";
-        body += "<h2>Domains and criteria</h2>";
+        body += '</ul>';
+        if (item.appraisalObjectivesCompleted) body += '<p><b>This appraisal shows completed objectives.</b></p>';
+        body += '<h2>Domains and criteria</h2>';
         const grouped = criteriaByDomain(item);
-        Object.keys(grouped).map(Number).sort((a, b) => a - b).forEach(domain => {
+        Object.keys(grouped).map(Number).sort((a,b)=>a-b).forEach(domain => {
             body += `<p><b>Domain ${domain}:</b> ${esc(grouped[domain].join(", "))}</p>`;
         });
-        const reflection = reflectionNarrative(item.reflection);
-        if (reflection) {
-            body += "<h2>Reflection</h2>";
-            body += reflection.split("\n\n").map(paragraph => `<p>${esc(paragraph)}</p>`).join("");
-        }
-        const reflectionPackedName = reflectionNames[item.id];
-        if (reflectionPackedName) {
-            body += "<h2>Uploaded Reflection</h2>";
-            const reflectionHref = "Reflections/" + String(reflectionPackedName).split("/").map(encodeURIComponent).join("/");
-            body += `<p><a href="${reflectionHref}">Open uploaded reflection: ${esc(reflectionPackedName)}</a></p>`;
+        const written = reflectionNarrative(item.reflection);
+        const uploaded = await uploadedReflectionText(item);
+        if (written || cleanText(uploaded)) {
+            body += '<h2>Reflection</h2>';
+            if (written) body += htmlParagraphs(written);
+            if (cleanText(uploaded)) body += '<h3>Uploaded reflection</h3>' + htmlParagraphs(uploaded);
         }
         const packedName = names[item.id];
-        body += "<h2>Evidence</h2>";
-        body += packedName
-            ? `<p><a href="${relativeEvidenceHref(packedName)}">Open evidence: ${esc(packedName)}</a></p>`
-            : "<p>No file attached</p>";
-    });
+        body += '<h2>Evidence</h2>';
+        body += packedName ? `<p><a href="${portableEvidenceHref(packedName)}">Open evidence: ${esc(packedName)}</a></p>` : '<p>No file attached</p>';
+        body += '</div>';
+    }
 
-    let index =
-    '<h1 id="domainCriterionIndex">' +
-    'Domain and Criterion Index' +
-    '</h1>';
+    let index = pageBreak + '<a name="domainCriterionIndex" id="domainCriterionIndex"></a><h1>Domain and Criterion Index</h1>';
     for (const domain of APP_DATA.domains) {
         index += `<h2>${esc(domain.name)}</h2>`;
         for (const criterion of APP_DATA.criteria.filter(entry => entry.domain === domain.id)) {
             const linked = sortedItems.filter(item => (item.criteria || []).includes(criterion.code));
             if (!linked.length) continue;
             index += `<h3>${esc(criterion.code)}</h3><ul>`;
-            index += linked.map(item =>
-                `<li><a href="#ev${item.id}">${esc(fmtDate(item.date) || "Date not entered")} - ${esc(item.title)}</a></li>`
-            ).join("");
-            index += "</ul>";
+            index += linked.map(item => `<li><a href="#${anchors[item.id]}">${esc(fmtDate(item.date) || "Date not entered")} - ${esc(item.title)}</a></li>`).join("");
+            index += '</ul>';
         }
     }
 
-    return `<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:Calibri,Arial;color:#1e3c4a}h1{page-break-before:always}h1:first-child{page-break-before:auto}h2{color:#109eaa}h3{color:#8c307b}.cover{text-align:center;padding-top:180px;page-break-after:always}</style></head><body><div class="cover"><h1>Portfolio for Specialist Pathway</h1><h2>${esc(profile.name || "Candidate")}</h2><p>${esc(profile.specialty || "")}</p></div>${contents}${body}${index}</body></html>`;
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Portfolio Document</title><style>
+@page{size:8.27in 11.69in;margin:1in}
+body,p,li{font-family:"Segoe UI",Arial,sans-serif;font-size:11pt;color:#1E3C4A;line-height:1.15}
+p{margin:0 0 8pt 0}ul{margin:0 0 12pt 20pt;padding-left:14pt}li{margin:0 0 4pt 0}
+h1{font-family:"Segoe UI",Arial,sans-serif;font-size:18pt;font-weight:700;color:#1E3C4A;margin:24pt 0 12pt;page-break-before:avoid;page-break-after:avoid}
+h2{font-family:"Segoe UI",Arial,sans-serif;font-size:14pt;font-weight:600;color:#109EAA;margin:18pt 0 6pt;page-break-before:avoid;page-break-after:avoid}
+h3{font-family:"Segoe UI",Arial,sans-serif;font-size:12pt;font-weight:600;color:#1F3763;margin:12pt 0 6pt;page-break-before:avoid;page-break-after:avoid}
+.cover{text-align:center;padding-top:180pt}.cover h1{margin:0 0 24pt}.cover h2{color:#109EAA;margin:0 0 8pt}.cover p{margin:0}
+.evidence-section{margin:0;page-break-before:avoid}a{color:#0563C1;text-decoration:underline}
+</style></head><body><div class="cover"><h1>Portfolio for Specialist Pathway</h1><h2>${esc(profile.name || "Candidate")}</h2><p>${esc(profile.specialty || "")}</p></div>${pageBreak}${contents}${body}${index}</body></html>`;
 }
-
-async function exportIndexed(items) {
-    const files = [];
-    const usedNames = {};
-    const indexedNames = {};
-    const reflectionNames = {};
-    for (const item of items) {
-        if (!item.file) continue;
-        let name = (item.fileName || `evidence_${item.id}`).replace(/[<>:"/\\|?*]/g, "_");
-        if (usedNames[name]) name = `${item.id}_${name}`;
-        usedNames[name] = true;
-        indexedNames[item.id] = name;
-        files.push({ name: "Evidence/" + name, data: item.file });
+function showIndexedPortfolioDownloadNotice(){
+    const html=`<h2>Important!</h2><p>Please ensure you extract or unzip the files before use to enable indexed evidence files to open.</p><p>Advise anyone receiving the zipped file to extract or unzip it before opening the Portfolio Document.</p><p>The <b>Portfolio Document and folder</b> may be renamed, but the structure inside the folder <b>must not</b> be changed.</p>`;
+    if(typeof modalChoice==="function"){modalChoice(html,[{id:"spbCloseIndexedNotice",className:"spb-primary",label:"I understand",value:"close"}]);return;}
+    alert("Important!\n\nPlease extract or unzip the files before use. The Portfolio Document and folder may be renamed, but the structure inside the folder MUST not be changed.");
+}
+async function exportIndexed(items){
+    const files=[],usedNames={},indexedNames={};
+    for(const item of items){
+        if(!item.file)continue;
+        let name=(item.fileName||`evidence_${item.id}`).replace(/[<>:"/\\|?*]/g,"_");
+        if(usedNames[name.toLowerCase()])name=`${item.id}_${name}`;
+        usedNames[name.toLowerCase()]=true;indexedNames[item.id]=name;
+        files.push({name:"Evidence/"+name,data:item.file});
     }
-    for (const item of items) {
-        if (!item.reflectionFile) continue;
-        let name = (item.reflectionFileName || `reflection_${item.id}`).replace(/[<>:"/\|?*]/g, "_");
-        const key = "reflection:" + name;
-        if (usedNames[key]) name = `${item.id}_${name}`;
-        usedNames[key] = true;
-        reflectionNames[item.id] = name;
-        files.push({ name: "Reflections/" + name, data: item.reflectionFile });
-    }
-    files.unshift({
-        name: "Indexed_Portfolio.doc",
-        data: new Blob(
-            ["\ufeff", await buildIndexedHtml(items, indexedNames, reflectionNames)],
-            { type: "application/msword" }
-        )
-    });
-    blobDownload(await makeZip(files), "Indexed_Portfolio_Pack.zip");
+    files.unshift({name:"Portfolio Document.doc",data:new Blob(["\ufeff",await buildIndexedHtml(items,indexedNames)],{type:"application/msword"})});
+    blobDownload(await makeZip(files),"Indexed_Portfolio_Pack.zip");
+    window.setTimeout(showIndexedPortfolioDownloadNotice,300);
 }
