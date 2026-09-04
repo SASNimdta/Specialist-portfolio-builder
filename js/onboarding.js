@@ -1048,7 +1048,7 @@ downloadLink.addEventListener(
     }
 }
 
-async function createAutomaticBackupDownload() {
+async function prepareAutomaticBackup() {
     if (typeof DB === "undefined" || typeof DB.all !== "function") {
         throw new Error("The portfolio database is not available.");
     }
@@ -1085,20 +1085,45 @@ async function createAutomaticBackupDownload() {
     if (!blob.size) throw new Error("The backup file was empty.");
     const date = createdAt.slice(0, 10);
     const time = createdAt.slice(11, 16).replace(":", "-");
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.download = `Specialist_Portfolio_Backup_${date}_${time}.spb`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
-    settings.lastMigrationAt = createdAt;
-    settings.lastAutomaticBackupAt = createdAt;
+    return {
+        blob,
+        count: records.length,
+        size: blob.size,
+        createdAt,
+        fileName: `Specialist_Portfolio_Backup_${date}_${time}.spb`
+    };
+}
+function recordSuccessfulBackup(prepared) {
+    settings.lastMigrationAt = prepared.createdAt;
+    settings.lastAutomaticBackupAt = prepared.createdAt;
     settings.changesSinceBackup = 0;
     settings.backupReminderDeferredAt = null;
     saveSettings();
-    return { count: records.length, size: blob.size };
+}
+function createPreparedBackupLink(prepared) {
+    const url = URL.createObjectURL(prepared.blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = prepared.fileName;
+    link.textContent = "Download Backup";
+    link.className = "primary";
+    link.setAttribute("role", "button");
+    link.dataset.backupUrl = url;
+    return link;
+}
+function releasePreparedBackupLink(link) {
+    const url = link?.dataset?.backupUrl;
+    if (url) window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+async function createAutomaticBackupDownload() {
+    const prepared = await prepareAutomaticBackup();
+    const link = createPreparedBackupLink(prepared);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    releasePreparedBackupLink(link);
+    recordSuccessfulBackup(prepared);
+    return prepared;
 }
 function backupIsDue() {
     const changes = Number(settings.changesSinceBackup || 0);
@@ -1109,17 +1134,17 @@ function backupIsDue() {
     return Number.isFinite(last) && Date.now() - last >= 30 * 24 * 60 * 60 * 1000;
 }
 function showAutomaticBackupReminder() {
-    if (!backupIsDue() || document.getElementById("spbAutomaticBackupNow")) return;
+    if (!backupIsDue() || document.getElementById("spbAutomaticBackupPrepare")) return;
     showModal(`
         <h2>Protect your portfolio</h2>
         <div class="spb-warning">
             <b>Download a backup to this device</b>
             <p>Your working portfolio is stored in browser storage. Clearing browser or site data can remove it.</p>
         </div>
-        <p>Download a restorable Portfolio Builder backup now and save it somewhere secure on this device or an approved drive.</p>
+        <p>Prepare a restorable Portfolio Builder backup, then download it to this device or an approved drive.</p>
         <div class="spb-actions">
             <button type="button" id="spbAutomaticBackupLater" class="spb-ghost">Remind Me Later</button>
-            <button type="button" id="spbAutomaticBackupNow" class="spb-primary">Download Backup Now</button>
+            <button type="button" id="spbAutomaticBackupPrepare" class="spb-primary">Prepare Backup</button>
         </div>
     `, false);
     document.getElementById("spbAutomaticBackupLater").addEventListener("click", function () {
@@ -1127,19 +1152,48 @@ function showAutomaticBackupReminder() {
         saveSettings();
         closeModal(true);
     }, { once: true });
-    document.getElementById("spbAutomaticBackupNow").addEventListener("click", async function () {
+    document.getElementById("spbAutomaticBackupPrepare").addEventListener("click", async function () {
         const button = this;
         button.disabled = true;
         button.textContent = "Preparing Backup...";
         try {
-            const result = await createAutomaticBackupDownload();
-            closeModal(true);
-            window.alert(`Backup downloaded to this device.\n\nEvidence items: ${result.count}`);
+            const prepared = await prepareAutomaticBackup();
+            showModal(`
+                <h2>Backup ready</h2>
+                <p>Your backup contains <b>${prepared.count}</b> evidence item${prepared.count === 1 ? "" : "s"}.</p>
+                <p>Select the link below to save the backup file to this device.</p>
+                <div class="spb-actions">
+                    <button type="button" id="spbAutomaticBackupCancel" class="spb-ghost">Cancel</button>
+                    <span id="spbAutomaticBackupDownloadArea"></span>
+                </div>
+                <p id="spbAutomaticBackupStatus" hidden></p>
+            `, false);
+
+            const downloadArea = document.getElementById("spbAutomaticBackupDownloadArea");
+            const downloadLink = createPreparedBackupLink(prepared);
+            downloadLink.id = "spbAutomaticBackupDownload";
+            downloadArea.appendChild(downloadLink);
+
+            document.getElementById("spbAutomaticBackupCancel").addEventListener("click", function () {
+                releasePreparedBackupLink(downloadLink);
+                closeModal(true);
+            }, { once: true });
+
+            downloadLink.addEventListener("click", function () {
+                recordSuccessfulBackup(prepared);
+                const status = document.getElementById("spbAutomaticBackupStatus");
+                if (status) {
+                    status.hidden = false;
+                    status.innerHTML = `<b>Download started.</b> Check this device's Downloads folder for ${prepared.fileName}. If no file appears, select Download Backup again.`;
+                }
+                downloadLink.textContent = "Download Backup Again";
+                releasePreparedBackupLink(downloadLink);
+            });
         } catch (error) {
             console.error("Automatic backup failed:", error);
             button.disabled = false;
-            button.textContent = "Download Backup Now";
-            window.alert("The backup could not be downloaded.\n\n" + (error.message || "An unknown error occurred."));
+            button.textContent = "Prepare Backup";
+            window.alert("The backup could not be prepared.\n\n" + (error.message || "An unknown error occurred."));
         }
     }, { once: true });
 }

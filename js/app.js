@@ -1,49 +1,719 @@
-function getEvidenceAgeStatus(v){if(!v)return{status:'unknown',label:'Date not entered',message:'',unsuitable:false};const d=new Date(v+'T00:00:00'),n=new Date(),y4=new Date(d),y5=new Date(d);y4.setFullYear(y4.getFullYear()+4);y5.setFullYear(y5.getFullYear()+5);if(n>=y5)return{status:'unsuitable',label:'Over 5 years old',message:'This evidence is 5 years old or more and is excluded from evidence-strength calculations.',unsuitable:true};if(n>=y4)return{status:'age-warning',label:'Approaching 5 years old',message:'This evidence is 4 years old or more and is approaching the 5-year limit.',unsuitable:false};return{status:'current',label:'Within 4 years',message:'',unsuitable:false}}
-const INTERVIEW_PLANS_KEY='spbInterviewPlans';let interviewPlans=readInterviewPlans();function readInterviewPlans(){try{return JSON.parse(localStorage.getItem(INTERVIEW_PLANS_KEY)||'{}')}catch(e){return{}}}function saveInterviewPlans(){localStorage.setItem(INTERVIEW_PLANS_KEY,JSON.stringify(interviewPlans))}
-let evidence=[],currentDomain=1;const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-function toast(t){const e=$('#toast');if(!e)return;e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200)}function notePortfolioChange(){if(window.SPBAutoBackup?.noteChange)window.SPBAutoBackup.noteChange()}
-function go(id){$$('.screen').forEach(x=>x.classList.remove('active'));$('#'+id)?.classList.add('active');$$('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));scrollTo(0,0);if(id==='dashboard')renderDashboard();if(id==='library')renderLibrary();if(id==='progress')renderProgress()}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-screen]');if(!b)return;let id=b.dataset.screen;if(id==='upload'&&!b.closest('.library-item'))resetForm();if(id==='dashboard'&&$('#upload')?.classList.contains('active')&&$('#editId')?.value)id='library';go(id)});
-function hasWrittenReflection(i){return['situation','hindrances','actions','results','plan'].some(k=>(i.reflection?.[k]||'').trim())}function hasUploadedReflection(i){return i.reflectionFile instanceof Blob}function reflectionText(i){return hasWrittenReflection(i)||hasUploadedReflection(i)}function reflectionStatusLabel(i){const w=hasWrittenReflection(i),u=hasUploadedReflection(i);return w&&u?'Written and uploaded reflections attached':w?'Written reflection attached':u?'Uploaded reflection attached':'Reflection outstanding'}
-const ALIAS={'Annual appraisal & evidence collected for appraisal':'Appraisal','Job plan':'Scope of Practice / Job Plan','Logbooks':'Logbook','Audit of personal clinical practice':'Audit','Clinical Audit projects':'Audit','Outcome data/audit':'Outcome Data','Multisource feedback':'Multisource Feedback','Patient feedback':'Patient Feedback','References from colleagues':'Reference','Professional or higher qualifications':'Qualification','CPD diary & reflections':'CPD Diary','QI projects':'Quality Improvement Project','Evidence of participation in or leading MDT':'MDT Evidence','MDT collaborative working':'MDT Evidence','Interview':'Interview'};
-function ptype(i){return i.evidenceType||ALIAS[(i.evidenceTypes||[])[0]]||(i.evidenceTypes||[])[0]||''}function subs(i){return i.evidenceSubtypes||[]}
-function matched(i,r){if(!r.types.includes(ptype(i)))return false;if(r.appraisalObjectivesCompleted&&!i.appraisalObjectivesCompleted)return false;return !r.subtypes?.length||subs(i).some(x=>r.subtypes.includes(x))}
-function statusFor(c){const req=c.minimumRequirements||[],items=evidence.filter(i=>!getEvidenceAgeStatus(i.date).unsuitable&&(i.criteria||[]).includes(c.code)&&reflectionText(i)),covered=req.filter(r=>items.some(i=>matched(i,r))||(r.types.includes('Interview')&&interviewPlans[c.code])),missing=req.filter(r=>!covered.includes(r)),done=covered.length,total=req.length;let points=0;if(done===total&&total){const minTypes=new Set(req.flatMap(r=>r.types)),counts={};items.forEach(i=>{const t=ptype(i);if(t)counts[t]=(counts[t]||0)+1});Object.entries(counts).forEach(([t,n])=>{points+=minTypes.has(t)?Math.min(Math.max(n-1,0)*.5,1):1+Math.min(Math.max(n-1,0)*.5,1)});points=Math.min(points,2)}const score=Math.round((total?done/total*70:0)+(done===total?points/2*30:0));const status=done===total&&points>=2?'strong':done===total?'minimum':done>=Math.ceil(total/2)?'almost':'development';return{status,done,total,missing,score,strengthPoints:points}}
-function domainStats(id){const criteria=APP_DATA.criteria.filter(c=>c.domain===id),s=criteria.map(statusFor),counts={development:s.filter(x=>x.status==='development').length,almost:s.filter(x=>x.status==='almost').length,minimum:s.filter(x=>x.status==='minimum').length,strong:s.filter(x=>x.status==='strong').length},pct=Math.round(s.reduce((a,x)=>a+x.score,0)/s.length),status=counts.development?'development':counts.almost?'almost':counts.minimum?'minimum':'strong';return{criteria,counts,pct,status}}
-function domainCard(d){const s=domainStats(d.id);return`<article class="domain-card status-${s.status}" data-domain="${d.id}"><h3>${d.name}</h3><div class="pct">${s.pct}%</div><div class="bar"><i style="width:${s.pct}%"></i></div><div class="counts">${s.counts.development} needs development · ${s.counts.almost} almost met · ${s.counts.minimum} minimum met · ${s.counts.strong} strong</div></article>`}
-function renderDashboard(){const a=APP_DATA.criteria.map(statusFor),c={development:a.filter(x=>x.status==='development').length,almost:a.filter(x=>x.status==='almost').length,minimum:a.filter(x=>x.status==='minimum').length,strong:a.filter(x=>x.status==='strong').length},pct=Math.round(a.reduce((n,x)=>n+x.score,0)/a.length),r=evidence.filter(reflectionText).length;$('#overallPct').textContent=pct+'%';$('#overallBar').style.width=pct+'%';$('#criteriaSummary').textContent=`Overall evidence-strength progress · ${c.minimum+c.strong} minimum profiles met · ${c.strong} strong profiles`;$('#completeCount').textContent=c.minimum+c.strong;$('#progressCount').textContent=c.almost;$('#outstandingCount').textContent=c.development;$('#evidenceCount').textContent=evidence.length;$('#withReflection').textContent=r;$('#withoutReflection').textContent=evidence.length-r;$('#dashboardDomains').innerHTML=APP_DATA.domains.map(domainCard).join('')}
-function renderProgress(){$('#progressDomains').innerHTML=APP_DATA.domains.map(domainCard).join('')}document.addEventListener('click',e=>{const c=e.target.closest('[data-domain]');if(c)openDomain(+c.dataset.domain)});
-const labels={development:'Evidence needs development',almost:'Minimum evidence almost met',minimum:'Minimum evidence profile met',strong:'Strong evidence profile'};
-function criterionHtml(c){const s=statusFor(c),hasInterview=(c.minimumRequirements||[]).some(r=>r.types.includes('Interview')),uploadedInterview=evidence.some(i=>!getEvidenceAgeStatus(i.date).unsuitable&&(i.criteria||[]).includes(c.code)&&ptype(i)==='Interview'&&reflectionText(i));return`<article class="criterion-card status-${s.status}"><b>${c.code}</b><p>${c.description}</p><small>${labels[s.status]} · ${s.done} of ${s.total} minimum components · ${s.score}% evidence strength</small>${s.missing.length?`<div class="missing"><b>Still to record:</b> ${s.missing.map(x=>esc(x.label)).join('; ')}</div>`:''}${hasInterview?`<div class="interview-plan"><label class="check"><input type="checkbox" class="interview-plan-check" data-criterion="${c.code}" ${interviewPlans[c.code]?'checked':''}><span>I intend to evidence this criterion at appointment interview</span></label><small>${uploadedInterview?'Reflected interview evidence is also recorded for this criterion.':'This is an internal planning marker only and will not appear in portfolio exports.'}</small></div>`:''}${s.done===s.total?`<div class="strength-note">Additional strength: ${s.strengthPoints} of 2 points</div>`:''}</article>`}
-function openDomain(id){currentDomain=id;const d=APP_DATA.domains.find(x=>x.id===id),s=domainStats(id);$('#domainTitle').textContent=d.name;$('#domainPct').textContent=s.pct+'%';$('#domainBar').style.width=s.pct+'%';$('#domainSummary').textContent=`${s.counts.development} needs development · ${s.counts.almost} almost met · ${s.counts.minimum} minimum met · ${s.counts.strong} strong`;$('#domainOutstanding').innerHTML=s.criteria.filter(c=>statusFor(c).status==='development').map(criterionHtml).join('')||'<p>None</p>';$('#domainProgress').innerHTML=s.criteria.filter(c=>statusFor(c).status==='almost').map(criterionHtml).join('')||'<p>None</p>';$('#domainComplete').innerHTML=s.criteria.filter(c=>['minimum','strong'].includes(statusFor(c).status)).map(criterionHtml).join('')||'<p>None</p>';go('domain')}
-function renderTypes(q='',sel=''){$('#evidenceTypes').innerHTML=APP_DATA.evidenceTypes.filter(x=>x.id.toLowerCase().includes(q.toLowerCase())).map(x=>`<label class="check"><input class="etype" type="radio" name="evidenceType" value="${esc(x.id)}" ${sel===x.id?'checked':''}><span>${esc(x.id)}</span></label>`).join('')}function selectedType(){return $('.etype:checked')?.value||''}
-function ensureControls(){if(!$('#evidenceSecondaryOptions')){const d=document.createElement('div');d.id='evidenceSecondaryOptions';d.className='secondary-options';$('#evidenceTypes').after(d)}if(!$('#appraisalObjectivesWrap')){const l=document.createElement('label');l.id='appraisalObjectivesWrap';l.className='check appraisal-objectives';l.hidden=true;l.innerHTML='<input type="checkbox" id="appraisalObjectivesCompleted"><span>This appraisal shows completed objectives</span>';$('#evidenceSecondaryOptions').after(l)}if(!$('#currentEvidenceFile')){const d=document.createElement('div');d.id='currentEvidenceFile';d.className='current-file';d.hidden=true;$('#evidenceFile').after(d)}if(!$('#editEvidenceManagement')){const d=document.createElement('section');d.id='editEvidenceManagement';d.className='edit-evidence-management';d.hidden=true;const a=$('#evidenceForm .actions');a? a.before(d):$('#evidenceForm').append(d)}}
-function renderSecondaryOptions(selected=[]){ensureControls();const x=APP_DATA.evidenceTypes.find(e=>e.id===selectedType()),o=x?.secondaryOptions||[];$('#evidenceSecondaryOptions').innerHTML=o.length?`<p><b>Select what this evidence covers:</b></p><div class="secondary-grid">${o.map(v=>`<label class="check"><input type="checkbox" class="evidence-subtype" value="${esc(v)}" ${selected.includes(v)?'checked':''}><span>${esc(v)}</span></label>`).join('')}</div>`:'';$('#appraisalObjectivesWrap').hidden=selectedType()!=='Appraisal'}function selectedSubtypes(){return $$('.evidence-subtype:checked').map(x=>x.value)}
-function selectedCriteria(){return $$('.criterion-select').map(x=>x.value).filter(Boolean)}
-function updateSuggestionState(){$$('.suggest-chip[data-suggest-criterion]').forEach(b=>b.classList.toggle('selected',selectedCriteria().includes(b.dataset.suggestCriterion)))}
-function updateSuggestions(){const heading=$('#suggestions')?.parentElement?.querySelector('h3');if(heading)heading.textContent='Commonly associated criteria';const x=APP_DATA.evidenceTypes.find(e=>e.id===selectedType()),criteria=x?.suggestedCriteria||[];$('#suggestions').innerHTML=criteria.length?criteria.map(i=>`<button type="button" class="suggest-chip ${selectedCriteria().includes(i)?'selected':''}" data-suggest-criterion="${i}">${i}</button>`).join(''):'Select an evidence type to see suggestions. Suggestions are guidance only and are never selected automatically.'}
-function applySuggestedCriterion(code){const domain=+code.split('.')[0],box=$(`.domain-map[data-map="${domain}"]`),check=box?.querySelector('.dcheck'),rows=box?.querySelector('.criterion-rows');if(!box||!check||!rows)return;if(selectedCriteria().includes(code)){updateSuggestionState();return}check.checked=true;box.classList.add('open');const empty=[...rows.querySelectorAll('.criterion-select')].find(x=>!x.value);if(empty)empty.value=code;else rows.insertAdjacentHTML('beforeend',criterionRow(domain,code));updateCriterionAvailability();updateSuggestionState()}
-function renderDomainMapper(selected={}){$('#domainMapper').innerHTML=APP_DATA.domains.map(d=>{const rows=selected[d.id]||[];return`<div class="domain-map ${rows.length?'open':''}" data-map="${d.id}"><label class="domain-map-head"><input type="checkbox" class="dcheck" value="${d.id}" ${rows.length?'checked':''}> ${d.name}</label><div class="criterion-controls"><div class="criterion-rows">${rows.map(v=>criterionRow(d.id,v)).join('')}</div><button type="button" class="ghost add-criterion" data-add="${d.id}">+ Add another criterion</button></div></div>`}).join('');updateCriterionAvailability();updateSuggestionState()}
-function criterionRow(d,v=''){return`<div class="criterion-row"><select class="criterion-select"><option value="">Select criterion</option>${APP_DATA.criteria.filter(c=>c.domain===d).map(c=>`<option value="${c.code}" ${c.code===v?'selected':''}>${c.code} · ${esc(c.description)}</option>`).join('')}</select><button type="button" class="danger remove-criterion">Remove</button></div>`}
-function updateCriterionAvailability(){const s=$$('.criterion-select'),v=s.map(x=>x.value).filter(Boolean);s.forEach(x=>[...x.options].forEach(o=>{if(o.value)o.disabled=o.value!==x.value&&v.includes(o.value)}));updateSuggestionState()}function mapping(){const o={};$$('.domain-map').forEach(b=>{if(b.querySelector('.dcheck').checked)o[+b.dataset.map]=[...b.querySelectorAll('.criterion-select')].map(x=>x.value).filter(Boolean)});return o}
-document.addEventListener('change',e=>{if(e.target.classList.contains('interview-plan-check')){interviewPlans[e.target.dataset.criterion]=e.target.checked;if(!e.target.checked)delete interviewPlans[e.target.dataset.criterion];saveInterviewPlans();openDomain(currentDomain);renderDashboard();renderProgress();return}if(e.target.classList.contains('etype')){renderSecondaryOptions();updateSuggestions()}if(e.target.classList.contains('criterion-select'))updateCriterionAvailability();if(e.target.classList.contains('dcheck')){const b=e.target.closest('.domain-map'),r=b.querySelector('.criterion-rows');b.classList.toggle('open',e.target.checked);if(e.target.checked&&!r.children.length)r.insertAdjacentHTML('beforeend',criterionRow(+e.target.value));updateCriterionAvailability()}});document.addEventListener('click',e=>{const sc=e.target.closest('[data-suggest-criterion]');if(sc)return applySuggestedCriterion(sc.dataset.suggestCriterion);if(e.target.matches('.add-criterion')){e.target.previousElementSibling.insertAdjacentHTML('beforeend',criterionRow(+e.target.dataset.add));updateCriterionAvailability()}if(e.target.matches('.remove-criterion')){e.target.closest('.criterion-row').remove();updateCriterionAvailability()}});
-function updateEvidenceDateWarning(){const i=$('#evidenceDate');if(!i)return;let w=$('#evidenceDateWarning');if(!w){w=document.createElement('div');w.id='evidenceDateWarning';i.after(w)}const a=getEvidenceAgeStatus(i.value);w.className='evidence-age-message '+a.status;w.textContent=a.message;w.hidden=!a.message}
-function ensureLibraryReflectionFilter(){if($('#reflectionMissingFilter'))return;const search=$('#librarySearch');if(!search)return;const label=document.createElement('label');label.className='library-reflection-filter';label.innerHTML='<input type="checkbox" id="reflectionMissingFilter"><span>Show only evidence with no reflection</span>';search.insertAdjacentElement('afterend',label);$('#reflectionMissingFilter').addEventListener('change',renderLibrary)}
-function promptForReflection(item){return modalChoice(`<h2>Add a reflection?</h2><p><b>${esc(item.title)}</b> has been saved.</p><p>Every evidence item needs a written or uploaded reflection before it counts fully towards evidence-strength progress.</p><div class="spb-warning"><b>Upload text-based reflections only.</b><p>Upload a Word document (.docx) or plain text file (.txt). PDF files, images and Apple Pages files are not accepted. If your reflection is handwritten or stored in Apple Notes, use Write Reflection to type or paste it into the Portfolio Builder.</p></div>`,[{id:'spbWriteReflectionNow',className:'spb-primary',label:'Write Reflection Now',value:'write'},{id:'spbUploadReflectionNow',className:'spb-secondary',label:'Upload Reflection Now',value:'upload'},{id:'spbAddReflectionLater',className:'spb-ghost',label:'Do This Later',value:'later'}])}
-async function continueAfterEvidenceSave(item){const choice=await promptForReflection(item);if(choice==='write'){await openReflection(item.id);return}go('library');if(choice==='upload')chooseReflectionFile(item.id)}
-function resetForm(){$('#evidenceForm').reset();$('#editId').value='';$('#uploadHeading').textContent='Upload evidence';renderTypes();ensureControls();renderSecondaryOptions();renderDomainMapper();$('#suggestions').textContent='Select an evidence type to see suggestions. Suggestions are guidance only and are never selected automatically.';$('#currentEvidenceFile').hidden=true;$('#currentEvidenceFile').textContent='';$('#editEvidenceManagement').hidden=true;$('#editEvidenceManagement').innerHTML=''}
-function modalChoice(html,buttons){return new Promise(resolve=>{let l=$('#spbModalLayer');if(!l){l=document.createElement('div');l.id='spbModalLayer';l.className='spb-modal-layer';document.body.append(l)}l.innerHTML=`<div class="spb-modal" role="dialog" aria-modal="true">${html}<div class="spb-actions">${buttons.map(b=>`<button type="button" id="${b.id}" class="${b.className}">${b.label}</button>`).join('')}</div></div>`;l.hidden=false;document.body.classList.add('spb-lock');buttons.forEach(b=>$('#'+b.id).onclick=()=>{const v=typeof b.value==='function'?b.value():b.value;l.hidden=true;l.innerHTML='';document.body.classList.remove('spb-lock');resolve(v)})})}
-async function duplicateDecision(matches){const list=matches.map((i,n)=>`<label class="duplicate-match"><input type="radio" name="duplicateMatch" value="${i.id}" ${n?'':'checked'}><span><b>${esc(i.title)}</b><br>${fmtDate(i.date)} · ${esc(ptype(i))}</span></label>`).join(''),first=await modalChoice(`<h2>Possible duplicate evidence</h2><p>Existing evidence has the same activity date and evidence type.</p><div class="duplicate-list">${list}</div><p>Is the evidence currently being added different from the existing evidence?</p>`,[{id:'spbDifferentEvidence',className:'spb-primary',label:'This is different evidence',value:'different'},{id:'spbDuplicateEvidence',className:'spb-secondary',label:'This is a duplicate',value:()=>+document.querySelector('input[name=duplicateMatch]:checked')?.value||matches[0].id}]);if(first==='different')return{action:'save'};const old=matches.find(x=>x.id===first)||matches[0],second=await modalChoice(`<h2>Amend existing evidence?</h2><p>The current entry appears to duplicate:</p><div class="spb-summary"><b>${esc(old.title)}</b><br>${fmtDate(old.date)} · ${esc(ptype(old))}</div><p>Would you like to amend the existing evidence item?</p>`,[{id:'spbDiscardDuplicate',className:'spb-ghost',label:'No, Discard New Entry',value:'discard'},{id:'spbAmendExisting',className:'spb-primary',label:'Amend Existing Entry',value:'amend'}]);return{action:second,existing:old}}
-function reflectionPreview(i){const labels={situation:'Situation',hindrances:'Hindrances',actions:'Actions',results:'Results',plan:'Plan'},parts=Object.entries(labels).filter(([k])=>(i.reflection?.[k]||'').trim()).map(([k,l])=>`<div class="reflection-preview-part"><b>${l}</b><p>${esc(i.reflection[k])}</p></div>`).join('');return parts||'<p>No written reflection attached.</p>'}
-function renderEditManagement(i){ensureControls();const box=$('#editEvidenceManagement');box.hidden=false;box.innerHTML=`<h3>Manage evidence item</h3><div class="edit-management-block"><h4>Written reflection</h4>${reflectionPreview(i)}<div class="item-actions"><button type="button" class="secondary edit-written-reflection" data-id="${i.id}">${hasWrittenReflection(i)?'Amend written reflection':'Write reflection'}</button>${hasWrittenReflection(i)?`<button type="button" class="danger delete-written-reflection" data-id="${i.id}">Delete written reflection</button>`:''}</div></div><div class="edit-management-block"><h4>Uploaded reflection</h4><p class="reflection-upload-guidance"><b>Upload text-based reflections only.</b> Upload a Word document (.docx) or plain text file (.txt). PDF files, images and Apple Pages files are not accepted. If your reflection is handwritten or stored in Apple Notes, use Write Reflection to type or paste it into the Portfolio Builder.</p><p>${i.reflectionFileName?esc(i.reflectionFileName):'No uploaded reflection file.'}</p><div class="item-actions"><button type="button" class="secondary edit-upload-reflection" data-id="${i.id}">${i.reflectionFile?'Replace uploaded reflection':'Upload reflection'}</button>${i.reflectionFile?`<button type="button" class="ghost download-reflection-item" data-id="${i.id}">Download reflection</button><button type="button" class="danger delete-uploaded-reflection" data-id="${i.id}">Delete uploaded reflection</button>`:''}</div></div><div class="edit-management-danger"><button type="button" class="danger delete-evidence-from-edit" data-id="${i.id}">Delete evidence item</button></div>`}
-async function editEvidence(id){const i=await DB.get(id);if(!i)return;resetForm();$('#editId').value=i.id;$('#uploadHeading').textContent='Edit evidence';$('#evidenceTitle').value=i.title;$('#evidenceDate').value=i.date;renderTypes('',ptype(i));renderSecondaryOptions(subs(i));$('#appraisalObjectivesCompleted').checked=!!i.appraisalObjectivesCompleted;const s={};(i.domains||[]).forEach(d=>s[d]=(i.criteria||[]).filter(c=>+c.split('.')[0]===d));renderDomainMapper(s);updateSuggestions();updateEvidenceDateWarning();$('#currentEvidenceFile').hidden=false;$('#currentEvidenceFile').innerHTML=`<b>Current file:</b> ${esc(i.fileName||'No file name recorded')}<br><span>Select a new file below only if the current file needs to be replaced.</span>`;renderEditManagement(i);go('upload')}
-$('#typeSearch')?.addEventListener('input',e=>renderTypes(e.target.value,selectedType()));$('#evidenceDate')?.addEventListener('input',updateEvidenceDateWarning);$('#evidenceDate')?.addEventListener('change',updateEvidenceDateWarning);$('#evidenceFile')?.addEventListener('change',e=>{if(!e.target.files.length||!$('#editId').value)return;const old=$('#currentEvidenceFile').textContent.replace(/^Current file:\s*/i,'');if(!confirm(`Selecting a new file will replace the existing file${old?` (${old})`:''}. Continue?`))e.target.value=''});
-$('#evidenceForm')?.addEventListener('submit',async e=>{e.preventDefault();const eid=$('#editId').value?+$('#editId').value:null,old=eid?await DB.get(eid):null,file=$('#evidenceFile').files[0]||old?.file||null,type=selectedType(),m=mapping(),criteria=[...new Set(Object.values(m).flat())],cfg=APP_DATA.evidenceTypes.find(x=>x.id===type);if(!file&&!old)return toast('Please choose an evidence file');if(!type)return toast('Select an evidence type');if(cfg?.secondaryOptions?.length&&!selectedSubtypes().length)return toast('Select what this evidence covers');if(!criteria.length)return toast('Select at least one criterion');const date=$('#evidenceDate').value,matches=eid?[]:evidence.filter(i=>i.date===date&&ptype(i)===type);if(matches.length){const d=await duplicateDecision(matches);if(d.action==='discard'){resetForm();go('dashboard');return toast('Duplicate entry discarded')}if(d.action==='amend')return editEvidence(d.existing.id)}const item={...(old||{}),id:eid||Date.now(),title:$('#evidenceTitle').value.trim(),date,file,fileName:file?.name||old?.fileName||'',evidenceType:type,evidenceSubtypes:selectedSubtypes(),appraisalObjectivesCompleted:type==='Appraisal'&&!!$('#appraisalObjectivesCompleted')?.checked,criteria,domains:Object.keys(m).map(Number),reflection:old?.reflection||null,reflectionFile:old?.reflectionFile,reflectionFileName:old?.reflectionFileName,reflectionFileType:old?.reflectionFileType,updated:new Date().toISOString()};delete item.evidenceTypes;await DB.put(item);evidence=await DB.all();notePortfolioChange();toast('Evidence saved');if(!reflectionText(item))await continueAfterEvidenceSave(item);else go('library')});
-function renderLibrary(){const q=($('#librarySearch')?.value||'').toLowerCase(),missingOnly=!!$('#reflectionMissingFilter')?.checked,list=evidence.filter(i=>(!missingOnly||!reflectionText(i))&&[i.title,ptype(i),...subs(i),...(i.criteria||[])].join(' ').toLowerCase().includes(q));$('#evidenceLibrary').innerHTML=list.length?list.sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(i=>{const a=getEvidenceAgeStatus(i.date),none=!reflectionText(i);return`<article class="library-item"><h3>${esc(i.title)}</h3><div class="meta"><span>${fmtDate(i.date)}</span><span>${esc(i.fileName)}</span><span class="evidence-age-badge ${a.status}">${a.label}</span><span class="reflection ${none?'no':'yes'}">${reflectionStatusLabel(i)}</span></div>${a.message?`<div class="evidence-age-alert ${a.status}">${a.message}</div>`:''}<div class="chips"><span class="chip primary-type">${esc(ptype(i))}</span>${subs(i).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}${i.appraisalObjectivesCompleted?'<span class="chip">Completed objectives recorded</span>':''}${(i.criteria||[]).map(x=>`<span class="chip">${x}</span>`).join('')}</div><div class="item-actions"><button class="ghost edit-item" data-id="${i.id}">Edit</button>${none?`<button class="secondary reflect-item" data-id="${i.id}">Write Reflection</button><button class="secondary upload-reflection-item" data-id="${i.id}">Upload Reflection</button>`:''}</div></article>`}).join(''):'<p>No matching evidence has been added.</p>'}
-$('#librarySearch')?.addEventListener('input',renderLibrary);document.addEventListener('click',async e=>{let b=e.target.closest('.edit-item');if(b)return editEvidence(+b.dataset.id);b=e.target.closest('.reflect-item,.edit-written-reflection');if(b)return openReflection(+b.dataset.id);b=e.target.closest('.upload-reflection-item,.edit-upload-reflection');if(b)return chooseReflectionFile(+b.dataset.id);b=e.target.closest('.download-reflection-item');if(b){const i=await DB.get(+b.dataset.id);if(i?.reflectionFile)downloadStoredBlob(i.reflectionFile,i.reflectionFileName);return}b=e.target.closest('.delete-written-reflection');if(b&&confirm('Delete the written reflection from this evidence item?')){const i=await DB.get(+b.dataset.id);i.reflection=null;await DB.put(i);evidence=await DB.all();notePortfolioChange();await editEvidence(i.id);return toast('Written reflection deleted')}b=e.target.closest('.delete-uploaded-reflection');if(b&&confirm('Delete the uploaded reflection file from this evidence item?')){const i=await DB.get(+b.dataset.id);delete i.reflectionFile;delete i.reflectionFileName;delete i.reflectionFileType;await DB.put(i);evidence=await DB.all();notePortfolioChange();await editEvidence(i.id);return toast('Uploaded reflection deleted')}b=e.target.closest('.delete-evidence-from-edit');if(b&&confirm('Delete this evidence item?')){await DB.remove(+b.dataset.id);evidence=await DB.all();notePortfolioChange();resetForm();go('library');return toast('Evidence deleted')}});
-async function openReflection(id){const i=await DB.get(id);$('#reflectionId').value=id;$('#reflectionTitle').textContent=`Reflection: ${i.title}`;['situation','hindrances','actions','results','plan'].forEach(k=>$('#'+k).value=i.reflection?.[k]||'');go('reflection')}$('#reflectionForm')?.addEventListener('submit',async e=>{e.preventDefault();const i=await DB.get(+$('#reflectionId').value);i.reflection={situation:$('#situation').value,hindrances:$('#hindrances').value,actions:$('#actions').value,results:$('#results').value,plan:$('#plan').value};await DB.put(i);evidence=await DB.all();notePortfolioChange();toast('Reflection saved');go('library')});
-async function isAllowedReflectionFile(file){const name=String(file?.name||'').toLowerCase(),extension=name.includes('.')?name.slice(name.lastIndexOf('.')):'',bytes=new Uint8Array(await file.slice(0,8).arrayBuffer()),starts=(...values)=>values.every((value,index)=>bytes[index]===value);if(extension==='.docx')return starts(0x50,0x4b);if(extension!=='.txt')return false;if(starts(0x25,0x50,0x44,0x46)||starts(0x89,0x50,0x4e,0x47)||starts(0xff,0xd8,0xff)||starts(0x47,0x49,0x46,0x38)||starts(0x50,0x4b))return false;try{new TextDecoder('utf-8',{fatal:true}).decode(await file.arrayBuffer());return true}catch(error){return false}}
-function chooseReflectionFile(id){const x=document.createElement('input');x.type='file';x.accept='.docx,.txt,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain';x.hidden=true;document.body.append(x);x.addEventListener('change',async()=>{const f=x.files[0];x.remove();if(!f)return;if(!await isAllowedReflectionFile(f)){alert('Only text-based reflection files are accepted. Upload a Word document (.docx) or plain text file (.txt). PDF files, images and Apple Pages files are not accepted.');return}const i=await DB.get(id);if(i.reflectionFile&&!confirm(`Replace the existing uploaded reflection file (${i.reflectionFileName||'current file'})?`))return;i.reflectionFile=f;i.reflectionFileName=f.name;i.reflectionFileType=f.type||'application/octet-stream';await DB.put(i);evidence=await DB.all();notePortfolioChange();if($('#editId')?.value==String(id))await editEvidence(id);else{renderLibrary();renderDashboard()}toast('Reflection uploaded')},{once:true});x.click()}function downloadStoredBlob(b,n){const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n||'reflection';document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},1500)}
-$('#saveProfile')?.addEventListener('click',()=>{localStorage.setItem('portfolioProfile',JSON.stringify({name:$('#candidateName')?.value.trim()||'',specialty:$('#candidateSpecialty')?.value.trim()||''}));toast('Portfolio details saved')});$('#fullExport')?.addEventListener('click',()=>exportFull(evidence));$('#indexedExport')?.addEventListener('click',()=>exportIndexed(evidence));$('#menuBtn')?.addEventListener('click',()=>$('#nav').classList.toggle('open'));
-function ensureExportEditingNote(){if($('#portfolioEditingNote'))return;const screen=$('#export'),grid=screen?.querySelector('.export-grid');if(!screen)return;const note=document.createElement('div');note.id='portfolioEditingNote';note.className='suggest portfolio-editing-note';note.innerHTML='<b>Portfolio documents can be edited after export.</b><p>You can add or remove information and change the formatting before sharing or submitting the portfolio. For the Indexed Portfolio Pack, the <b>Portfolio Document and folder</b> may be renamed, but the structure inside the folder must remain unchanged so the evidence links continue to work.</p>';if(grid)grid.insertAdjacentElement('beforebegin',note);else screen.insertAdjacentElement('afterbegin',note)}
-window.addEventListener('DOMContentLoaded',async()=>{evidence=await DB.all();ensureLibraryReflectionFilter();ensureExportEditingNote();renderTypes();ensureControls();renderSecondaryOptions();renderDomainMapper();renderDashboard();renderProgress();const p=JSON.parse(localStorage.getItem('portfolioProfile')||'{}');if($('#candidateName'))$('#candidateName').value=p.name||'';if($('#candidateSpecialty'))$('#candidateSpecialty').value=p.specialty||'';if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(()=>{})});
+function getEvidenceAgeStatus(v) {
+    if(!v)return {
+        status:'unknown', label:'Date not entered', message:'', unsuitable:false
+    }
+    ;
+    const d=new Date(v+'T00:00:00'), n=new Date(), y4=new Date(d), y5=new Date(d);
+    y4.setFullYear(y4.getFullYear()+4);
+    y5.setFullYear(y5.getFullYear()+5);
+    if(n>=y5)return {
+        status:'unsuitable', label:'Over 5 years old', message:'This evidence is 5 years old or more and is excluded from evidence-strength calculations.', unsuitable:true
+    }
+    ;
+    if(n>=y4)return {
+        status:'age-warning', label:'Approaching 5 years old', message:'This evidence is 4 years old or more and is approaching the 5-year limit.', unsuitable:false
+    }
+    ;
+    return {
+        status:'current', label:'Within 4 years', message:'', unsuitable:false
+    }
+}
+const INTERVIEW_PLANS_KEY='spbInterviewPlans';
+let interviewPlans=readInterviewPlans();
+function readInterviewPlans() {
+    try {
+        return JSON.parse(localStorage.getItem(INTERVIEW_PLANS_KEY)||'{}')
+    } catch(e) {
+        return {
+        }
+    }
+}
+function saveInterviewPlans() {
+    localStorage.setItem(INTERVIEW_PLANS_KEY, JSON.stringify(interviewPlans))
+}
+let evidence=[], currentDomain=1;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function toast(t) {
+    const e=$('#toast');
+    if(!e)return;
+    e.textContent=t;
+    e.classList.add('show');
+    setTimeout(()=>e.classList.remove('show'), 2200)
+}
+function notePortfolioChange() {
+    if(window.SPBAutoBackup?.noteChange)window.SPBAutoBackup.noteChange()
+}
+function go(id) {
+    $$('.screen').forEach(x=>x.classList.remove('active'));
+    $('#'+id)?.classList.add('active');
+    $$('.nav button').forEach(x=>x.classList.toggle('active', x.dataset.screen===id));
+    scrollTo(0, 0);
+    if(id==='dashboard')renderDashboard();
+    if(id==='library')renderLibrary();
+}
+document.addEventListener('click', e=> {
+    const b=e.target.closest('[data-screen]');
+    if(!b)return;
+    let id=b.dataset.screen;
+    if(id==='upload'&&!b.closest('.library-item'))resetForm();
+    if(id==='dashboard'&&$('#upload')?.classList.contains('active')&&$('#editId')?.value)id='library';
+    $('#nav')?.classList.remove('open');
+    go(id)
+}
+);
+function hasWrittenReflection(i) {
+    return['situation', 'hindrances', 'actions', 'results', 'plan'].some(k=>(i.reflection?.[k]||'').trim())
+}
+function hasUploadedReflection(i) {
+    return i.reflectionFile instanceof Blob
+}
+function reflectionText(i) {
+    return hasWrittenReflection(i)||hasUploadedReflection(i)
+}
+function reflectionStatusLabel(i) {
+    const w=hasWrittenReflection(i), u=hasUploadedReflection(i);
+    return w&&u?'Written and uploaded reflections attached':w?'Written reflection attached':u?'Uploaded reflection attached':'Reflection outstanding'
+}
+const ALIAS= {
+    'Annual appraisal & evidence collected for appraisal':'Appraisal', 'Job plan':'Scope of Practice / Job Plan', 'Logbooks':'Logbook', 'Audit of personal clinical practice':'Audit', 'Clinical Audit projects':'Audit', 'Outcome data/audit':'Outcome Data', 'Multisource feedback':'Multisource Feedback', 'Patient feedback':'Patient Feedback', 'References from colleagues':'Reference', 'Professional or higher qualifications':'Qualification', 'CPD diary & reflections':'CPD Diary', 'QI projects':'Quality Improvement Project', 'Evidence of participation in or leading MDT':'MDT Evidence', 'MDT collaborative working':'MDT Evidence', 'Interview':'Interview'
+}
+;
+function ptype(i) {
+    return i.evidenceType||ALIAS[(i.evidenceTypes||[])[0]]||(i.evidenceTypes||[])[0]||''
+}
+function subs(i) {
+    return i.evidenceSubtypes||[]
+}
+function matched(i, r) {
+    if(!r.types.includes(ptype(i)))return false;
+    if(r.appraisalObjectivesCompleted&&!i.appraisalObjectivesCompleted)return false;
+    return !r.subtypes?.length||subs(i).some(x=>r.subtypes.includes(x))
+}
+function statusFor(c) {
+    const req=c.minimumRequirements||[], items=evidence.filter(i=>!getEvidenceAgeStatus(i.date).unsuitable&&(i.criteria||[]).includes(c.code)&&reflectionText(i)), covered=req.filter(r=>items.some(i=>matched(i, r))||(r.types.includes('Interview')&&interviewPlans[c.code])), missing=req.filter(r=>!covered.includes(r)), done=covered.length, total=req.length;
+    let points=0;
+    if(done===total&&total) {
+        const minTypes=new Set(req.flatMap(r=>r.types)), counts= {
+        }
+        ;
+        items.forEach(i=> {
+            const t=ptype(i);
+            if(t)counts[t]=(counts[t]||0)+1
+        }
+        );
+        Object.entries(counts).forEach(([t, n])=> {
+            points+=minTypes.has(t)?Math.min(Math.max(n-1, 0)*.5, 1):1+Math.min(Math.max(n-1, 0)*.5, 1)
+        }
+        );
+        points=Math.min(points, 2)
+    }
+    const score=Math.round((total?done/total*70:0)+(done===total?points/2*30:0));
+    const status=done===total&&points>=2?'strong':done===total?'minimum':done>=Math.ceil(total/2)?'almost':'development';
+    return {
+        status, done, total, missing, score, strengthPoints:points
+    }
+}
+function domainStats(id) {
+    const criteria=APP_DATA.criteria.filter(c=>c.domain===id), s=criteria.map(statusFor), counts= {
+        development:s.filter(x=>x.status==='development').length, almost:s.filter(x=>x.status==='almost').length, minimum:s.filter(x=>x.status==='minimum').length, strong:s.filter(x=>x.status==='strong').length
+    }
+    , pct=Math.round(s.reduce((a, x)=>a+x.score, 0)/s.length), status=counts.development?'development':counts.almost?'almost':counts.minimum?'minimum':'strong';
+    return {
+        criteria, counts, pct, status
+    }
+}
+function domainCard(d) {
+    const s=domainStats(d.id);
+    return`<article class="domain-card status-${s.status}" data-domain="${d.id}"><h3>${d.name}</h3><div class="pct">${s.pct}%</div><div class="bar"><i style="width:${s.pct}%"></i></div><div class="counts">${s.counts.development} needs development · ${s.counts.almost} almost met · ${s.counts.minimum} minimum met · ${s.counts.strong} strong</div></article>`
+}
+function renderDashboard() {
+    const a=APP_DATA.criteria.map(statusFor), c= {
+        development:a.filter(x=>x.status==='development').length, almost:a.filter(x=>x.status==='almost').length, minimum:a.filter(x=>x.status==='minimum').length, strong:a.filter(x=>x.status==='strong').length
+    }
+    , pct=Math.round(a.reduce((n, x)=>n+x.score, 0)/a.length), r=evidence.filter(reflectionText).length;
+    $('#overallPct').textContent=pct+'%';
+    $('#overallBar').style.width=pct+'%';
+    $('#criteriaSummary').textContent=`Overall evidence-strength progress · ${c.minimum+c.strong} minimum profiles met · ${c.strong} strong profiles`;
+    $('#completeCount').textContent=c.minimum+c.strong;
+    $('#progressCount').textContent=c.almost;
+    $('#outstandingCount').textContent=c.development;
+    $('#evidenceCount').textContent=evidence.length;
+    $('#withReflection').textContent=r;
+    $('#withoutReflection').textContent=evidence.length-r;
+    $('#dashboardDomains').innerHTML=APP_DATA.domains.map(domainCard).join('')
+}
+document.addEventListener('click', e=> {
+    const c=e.target.closest('[data-domain]');
+    if(c)openDomain(+c.dataset.domain)
+}
+);
+const labels= {
+    development:'Evidence needs development', almost:'Minimum evidence almost met', minimum:'Minimum evidence profile met', strong:'Strong evidence profile'
+}
+;
+function criterionHtml(c) {
+    const s=statusFor(c), hasInterview=(c.minimumRequirements||[]).some(r=>r.types.includes('Interview')), uploadedInterview=evidence.some(i=>!getEvidenceAgeStatus(i.date).unsuitable&&(i.criteria||[]).includes(c.code)&&ptype(i)==='Interview'&&reflectionText(i));
+    return`<article class="criterion-card status-${s.status}"><b>${c.code}</b><p>${c.description}</p><small>${labels[s.status]} · ${s.done} of ${s.total} minimum components · ${s.score}% evidence strength</small>${s.missing.length?`<div class="missing"><b>Still to record:</b> ${s.missing.map(x=>esc(x.label)).join('; ')}
+    </div>`:''}${hasInterview?`<div class="interview-plan"><label class="check"><input type="checkbox" class="interview-plan-check" data-criterion="${c.code}" ${interviewPlans[c.code]?'checked':''}
+    ><span>I intend to evidence this criterion at appointment interview</span></label><small>${uploadedInterview?'Reflected interview evidence is also recorded for this criterion.':'This is an internal planning marker only and will not appear in portfolio exports.'}
+    </small></div>`:''}${s.done===s.total?`<div class="strength-note">Additional strength: ${s.strengthPoints}
+    of 2 points</div>`:''}</article>`
+}
+function openDomain(id) {
+    currentDomain=id;
+    const d=APP_DATA.domains.find(x=>x.id===id), s=domainStats(id);
+    $('#domainTitle').textContent=d.name;
+    $('#domainPct').textContent=s.pct+'%';
+    $('#domainBar').style.width=s.pct+'%';
+    $('#domainSummary').textContent=`${s.counts.development} needs development · ${s.counts.almost} almost met · ${s.counts.minimum} minimum met · ${s.counts.strong} strong`;
+    $('#domainOutstanding').innerHTML=s.criteria.filter(c=>statusFor(c).status==='development').map(criterionHtml).join('')||'<p>None</p>';
+    $('#domainProgress').innerHTML=s.criteria.filter(c=>statusFor(c).status==='almost').map(criterionHtml).join('')||'<p>None</p>';
+    $('#domainComplete').innerHTML=s.criteria.filter(c=>['minimum', 'strong'].includes(statusFor(c).status)).map(criterionHtml).join('')||'<p>None</p>';
+    go('domain')
+}
+function renderTypes(q='', sel='') {
+    $('#evidenceTypes').innerHTML=APP_DATA.evidenceTypes.filter(x=>x.id.toLowerCase().includes(q.toLowerCase())).map(x=>`<label class="check"><input class="etype" type="radio" name="evidenceType" value="${esc(x.id)}" ${sel===x.id?'checked':''}><span>${esc(x.id)}</span></label>`).join('')
+}
+function selectedType() {
+    return $('.etype:checked')?.value||''
+}
+function ensureControls() {
+    if(!$('#evidenceSecondaryOptions')) {
+        const d=document.createElement('div');
+        d.id='evidenceSecondaryOptions';
+        d.className='secondary-options';
+        $('#evidenceTypes').after(d)
+    }
+    if(!$('#appraisalObjectivesWrap')) {
+        const l=document.createElement('label');
+        l.id='appraisalObjectivesWrap';
+        l.className='check appraisal-objectives';
+        l.hidden=true;
+        l.innerHTML='<input type="checkbox" id="appraisalObjectivesCompleted"><span>This appraisal shows completed objectives</span>';
+        $('#evidenceSecondaryOptions').after(l)
+    }
+    if(!$('#currentEvidenceFile')) {
+        const d=document.createElement('div');
+        d.id='currentEvidenceFile';
+        d.className='current-file';
+        d.hidden=true;
+        $('#evidenceFile').after(d)
+    }
+    if(!$('#editEvidenceManagement')) {
+        const d=document.createElement('section');
+        d.id='editEvidenceManagement';
+        d.className='edit-evidence-management';
+        d.hidden=true;
+        const a=$('#evidenceForm .actions');
+        a? a.before(d):$('#evidenceForm').append(d)
+    }
+}
+function renderSecondaryOptions(selected=[]) {
+    ensureControls();
+    const x=APP_DATA.evidenceTypes.find(e=>e.id===selectedType()), o=x?.secondaryOptions||[];
+    $('#evidenceSecondaryOptions').innerHTML=o.length?`<p><b>Select what this evidence covers:</b></p><div class="secondary-grid">${o.map(v=>`<label class="check"><input type="checkbox" class="evidence-subtype" value="${esc(v)}" ${selected.includes(v)?'checked':''}
+    ><span>${esc(v)}
+    </span></label>`).join('')}</div>`:'';
+    $('#appraisalObjectivesWrap').hidden=selectedType()!=='Appraisal'
+}
+function selectedSubtypes() {
+    return $$('.evidence-subtype:checked').map(x=>x.value)
+}
+function selectedCriteria() {
+    return $$('.criterion-select').map(x=>x.value).filter(Boolean)
+}
+function updateSuggestionState() {
+    $$('.suggest-chip[data-suggest-criterion]').forEach(b=>b.classList.toggle('selected', selectedCriteria().includes(b.dataset.suggestCriterion)))
+}
+function updateSuggestions() {
+    const heading=$('#suggestions')?.parentElement?.querySelector('h3');
+    if(heading)heading.textContent='Commonly associated criteria';
+    const x=APP_DATA.evidenceTypes.find(e=>e.id===selectedType()), criteria=x?.suggestedCriteria||[];
+    $('#suggestions').innerHTML=criteria.length?criteria.map(i=>`<button type="button" class="suggest-chip ${selectedCriteria().includes(i)?'selected':''}" data-suggest-criterion="${i}">${i}</button>`).join(''):'Select an evidence type to see suggestions. Suggestions are guidance only and are never selected automatically.'
+}
+function applySuggestedCriterion(code) {
+    const domainId = Number(code.split('.')[0]);
+    const domainBox = $(`.domain-map[data-map="${domainId}"]`);
+    const domainCheckbox = domainBox?.querySelector('.dcheck');
+    const rows = domainBox?.querySelector('.criterion-rows');
+
+    if (!domainBox || !domainCheckbox || !rows) return;
+
+    const existingSelect = [...rows.querySelectorAll('.criterion-select')]
+        .find(select => select.value === code);
+
+    if (existingSelect) {
+        existingSelect.closest('.criterion-row')?.remove();
+
+        const hasRemainingCriteria = [...rows.querySelectorAll('.criterion-select')]
+            .some(select => Boolean(select.value));
+
+        if (!hasRemainingCriteria) {
+            domainCheckbox.checked = false;
+            domainBox.classList.remove('open');
+            rows.innerHTML = '';
+        }
+
+        updateCriterionAvailability();
+        return;
+    }
+
+    domainCheckbox.checked = true;
+    domainBox.classList.add('open');
+
+    const emptySelect = [...rows.querySelectorAll('.criterion-select')]
+        .find(select => !select.value);
+
+    if (emptySelect) emptySelect.value = code;
+    else rows.insertAdjacentHTML('beforeend', criterionRow(domainId, code));
+
+    updateCriterionAvailability();
+}
+function renderDomainMapper(selected= {
+}
+) {
+    $('#domainMapper').innerHTML=APP_DATA.domains.map(d=> {
+        const rows=selected[d.id]||[];
+        return`<div class="domain-map ${rows.length?'open':''}" data-map="${d.id}"><label class="domain-map-head"><input type="checkbox" class="dcheck" value="${d.id}" ${rows.length?'checked':''}> ${d.name}</label><div class="criterion-controls"><div class="criterion-rows">${rows.map(v=>criterionRow(d.id,v)).join('')}</div><button type="button" class="ghost add-criterion" data-add="${d.id}">+ Add another criterion</button></div></div>`
+    }
+    ).join('');
+    updateCriterionAvailability();
+    updateSuggestionState()
+}
+function criterionRow(domainId, selectedCode = '') {
+    const options = APP_DATA.criteria
+        .filter(criterion => criterion.domain === domainId)
+        .map(criterion => `
+            <option value="${criterion.code}" ${criterion.code === selectedCode ? 'selected' : ''}>
+                ${criterion.code} · ${esc(criterion.description)}
+            </option>
+        `)
+        .join('');
+
+    return `
+        <div class="criterion-row">
+            <select class="criterion-select">
+                <option value="">Select criterion</option>
+                ${options}
+            </select>
+            <button type="button" class="danger remove-criterion">Remove</button>
+        </div>
+    `;
+}
+function updateCriterionAvailability() {
+    const s=$$('.criterion-select'), v=s.map(x=>x.value).filter(Boolean);
+    s.forEach(x=>[...x.options].forEach(o=> {
+        if(o.value)o.disabled=o.value!==x.value&&v.includes(o.value)
+    }
+    ));
+    updateSuggestionState()
+}
+function mapping() {
+    const o= {
+    }
+    ;
+    $$('.domain-map').forEach(b=> {
+        if(b.querySelector('.dcheck').checked)o[+b.dataset.map]=[...b.querySelectorAll('.criterion-select')].map(x=>x.value).filter(Boolean)
+    }
+    );
+    return o
+}
+document.addEventListener('change', e=> {
+    if(e.target.classList.contains('interview-plan-check')) {
+        interviewPlans[e.target.dataset.criterion]=e.target.checked;
+        if(!e.target.checked)delete interviewPlans[e.target.dataset.criterion];
+        saveInterviewPlans();
+        openDomain(currentDomain);
+        renderDashboard();
+        return
+    }
+    if(e.target.classList.contains('etype')) {
+        renderSecondaryOptions();
+        updateSuggestions()
+    }
+    if(e.target.classList.contains('criterion-select'))updateCriterionAvailability();
+    if(e.target.classList.contains('dcheck')) {
+        const b=e.target.closest('.domain-map'), r=b.querySelector('.criterion-rows');
+        b.classList.toggle('open', e.target.checked);
+        if(e.target.checked&&!r.children.length)r.insertAdjacentHTML('beforeend', criterionRow(+e.target.value));
+        updateCriterionAvailability()
+    }
+}
+);
+document.addEventListener('click', e=> {
+    const sc=e.target.closest('[data-suggest-criterion]');
+    if(sc)return applySuggestedCriterion(sc.dataset.suggestCriterion);
+    if(e.target.matches('.add-criterion')) {
+        e.target.previousElementSibling.insertAdjacentHTML('beforeend', criterionRow(+e.target.dataset.add));
+        updateCriterionAvailability()
+    }
+    if(e.target.matches('.remove-criterion')) {
+        e.target.closest('.criterion-row').remove();
+        updateCriterionAvailability()
+    }
+}
+);
+function updateEvidenceDateWarning() {
+    const i=$('#evidenceDate');
+    if(!i)return;
+    let w=$('#evidenceDateWarning');
+    if(!w) {
+        w=document.createElement('div');
+        w.id='evidenceDateWarning';
+        i.after(w)
+    }
+    const a=getEvidenceAgeStatus(i.value);
+    w.className='evidence-age-message '+a.status;
+    w.textContent=a.message;
+    w.hidden=!a.message
+}
+function ensureLibraryReflectionFilter() {
+    if($('#reflectionMissingFilter'))return;
+    const search=$('#librarySearch');
+    if(!search)return;
+    const label=document.createElement('label');
+    label.className='library-reflection-filter';
+    label.innerHTML='<input type="checkbox" id="reflectionMissingFilter"><span>Show only evidence with no reflection</span>';
+    search.insertAdjacentElement('afterend', label);
+    $('#reflectionMissingFilter').addEventListener('change', renderLibrary)
+}
+function promptForReflection(item) {
+    return modalChoice(`<h2>Add a reflection?</h2><p><b>${esc(item.title)}</b> has been saved.</p><p>Every evidence item needs a written or uploaded reflection before it counts fully towards evidence-strength progress.</p><div class="spb-warning"><b>Upload text-based reflections only.</b><p>Upload a Word document (.docx) or plain text file (.txt). PDF files, images and Apple Pages files are not accepted. If your reflection is handwritten or stored in Apple Notes, use Write Reflection to type or paste it into the Portfolio Builder.</p></div>`, [ {
+        id:'spbWriteReflectionNow', className:'spb-primary', label:'Write Reflection Now', value:'write'
+    }
+    , {
+        id:'spbUploadReflectionNow', className:'spb-secondary', label:'Upload Reflection Now', value:'upload'
+    }
+    , {
+        id:'spbAddReflectionLater', className:'spb-ghost', label:'Do This Later', value:'later'
+    }
+    ])
+}
+async function continueAfterEvidenceSave(item) {
+    const choice=await promptForReflection(item);
+    if(choice==='write') {
+        await openReflection(item.id);
+        return
+    }
+    go('library');
+    if(choice==='upload')chooseReflectionFile(item.id)
+}
+function resetForm() {
+    $('#evidenceForm').reset();
+    $('#editId').value='';
+    $('#uploadHeading').textContent='Upload evidence';
+    renderTypes();
+    ensureControls();
+    renderSecondaryOptions();
+    renderDomainMapper();
+    $('#suggestions').textContent='Select an evidence type to see suggestions. Suggestions are guidance only and are never selected automatically.';
+    $('#currentEvidenceFile').hidden=true;
+    $('#currentEvidenceFile').textContent='';
+    $('#editEvidenceManagement').hidden=true;
+    $('#editEvidenceManagement').innerHTML=''
+}
+function modalChoice(html, buttons) {
+    return new Promise(resolve=> {
+        let l=$('#spbModalLayer');
+        if(!l) {
+            l=document.createElement('div');
+            l.id='spbModalLayer';
+            l.className='spb-modal-layer';
+            document.body.append(l)
+        }
+        l.innerHTML=`<div class="spb-modal" role="dialog" aria-modal="true">${html}<div class="spb-actions">${buttons.map(b=>`<button type="button" id="${b.id}" class="${b.className}">${b.label}
+        </button>`).join('')}</div></div>`;
+        l.hidden=false;
+        document.body.classList.add('spb-lock');
+        buttons.forEach(b=>$('#'+b.id).onclick=()=> {
+            const v=typeof b.value==='function'?b.value():b.value;
+            l.hidden=true;
+            l.innerHTML='';
+            document.body.classList.remove('spb-lock');
+            resolve(v)
+        }
+        )
+    }
+    )
+}
+async function duplicateDecision(matches) {
+    const list=matches.map((i, n)=>`<label class="duplicate-match"><input type="radio" name="duplicateMatch" value="${i.id}" ${n?'':'checked'}><span><b>${esc(i.title)}</b><br>${fmtDate(i.date)} · ${esc(ptype(i))}</span></label>`).join(''), first=await modalChoice(`<h2>Possible duplicate evidence</h2><p>Existing evidence has the same activity date and evidence type.</p><div class="duplicate-list">${list}</div><p>Is the evidence currently being added different from the existing evidence?</p>`, [ {
+        id:'spbDifferentEvidence', className:'spb-primary', label:'This is different evidence', value:'different'
+    }
+    , {
+        id:'spbDuplicateEvidence', className:'spb-secondary', label:'This is a duplicate', value:()=>+document.querySelector('input[name=duplicateMatch]:checked')?.value||matches[0].id
+    }
+    ]);
+    if(first==='different')return {
+        action:'save'
+    }
+    ;
+    const old=matches.find(x=>x.id===first)||matches[0], second=await modalChoice(`<h2>Amend existing evidence?</h2><p>The current entry appears to duplicate:</p><div class="spb-summary"><b>${esc(old.title)}</b><br>${fmtDate(old.date)} · ${esc(ptype(old))}</div><p>Would you like to amend the existing evidence item?</p>`, [ {
+        id:'spbDiscardDuplicate', className:'spb-ghost', label:'No, Discard New Entry', value:'discard'
+    }
+    , {
+        id:'spbAmendExisting', className:'spb-primary', label:'Amend Existing Entry', value:'amend'
+    }
+    ]);
+    return {
+        action:second, existing:old
+    }
+}
+function reflectionPreview(i) {
+    const labels= {
+        situation:'Situation', hindrances:'Hindrances', actions:'Actions', results:'Results', plan:'Plan'
+    }
+    , parts=Object.entries(labels).filter(([k])=>(i.reflection?.[k]||'').trim()).map(([k, l])=>`<div class="reflection-preview-part"><b>${l}</b><p>${esc(i.reflection[k])}</p></div>`).join('');
+    return parts||'<p>No written reflection attached.</p>'
+}
+function renderEditManagement(i) {
+    ensureControls();
+    const box=$('#editEvidenceManagement');
+    box.hidden=false;
+    box.innerHTML=`<h3>Manage evidence item</h3><div class="edit-management-block"><h4>Written reflection</h4>${reflectionPreview(i)}<div class="item-actions"><button type="button" class="secondary edit-written-reflection" data-id="${i.id}">${hasWrittenReflection(i)?'Amend written reflection':'Write reflection'}</button>${hasWrittenReflection(i)?`<button type="button" class="danger delete-written-reflection" data-id="${i.id}">Delete written reflection</button>`:''}</div></div><div class="edit-management-block"><h4>Uploaded reflection</h4><p class="reflection-upload-guidance"><b>Upload text-based reflections only.</b> Upload a Word document (.docx) or plain text file (.txt). PDF files, images and Apple Pages files are not accepted. If your reflection is handwritten or stored in Apple Notes, use Write Reflection to type or paste it into the Portfolio Builder.</p><p>${i.reflectionFileName?esc(i.reflectionFileName):'No uploaded reflection file.'}</p><div class="item-actions"><button type="button" class="secondary edit-upload-reflection" data-id="${i.id}">${i.reflectionFile?'Replace uploaded reflection':'Upload reflection'}</button>${i.reflectionFile?`<button type="button" class="ghost download-reflection-item" data-id="${i.id}">Download reflection</button><button type="button" class="danger delete-uploaded-reflection" data-id="${i.id}">Delete uploaded reflection</button>`:''}</div></div><div class="edit-management-danger"><button type="button" class="danger delete-evidence-from-edit" data-id="${i.id}">Delete evidence item</button></div>`
+}
+async function editEvidence(id) {
+    const i=await DB.get(id);
+    if(!i)return;
+    resetForm();
+    $('#editId').value=i.id;
+    $('#uploadHeading').textContent='Edit evidence';
+    $('#evidenceTitle').value=i.title;
+    $('#evidenceDate').value=i.date;
+    renderTypes('', ptype(i));
+    renderSecondaryOptions(subs(i));
+    $('#appraisalObjectivesCompleted').checked=!!i.appraisalObjectivesCompleted;
+    const s= {
+    }
+    ;
+    (i.domains||[]).forEach(d=>s[d]=(i.criteria||[]).filter(c=>+c.split('.')[0]===d));
+    renderDomainMapper(s);
+    updateSuggestions();
+    updateEvidenceDateWarning();
+    $('#currentEvidenceFile').hidden=false;
+    $('#currentEvidenceFile').innerHTML=`<b>Current file:</b> ${esc(i.fileName||'No file name recorded')}<br><span>Select a new file below only if the current file needs to be replaced.</span>`;
+    renderEditManagement(i);
+    go('upload')
+}
+$('#typeSearch')?.addEventListener('input', e=>renderTypes(e.target.value, selectedType()));
+$('#evidenceDate')?.addEventListener('input', updateEvidenceDateWarning);
+$('#evidenceDate')?.addEventListener('change', updateEvidenceDateWarning);
+$('#evidenceFile')?.addEventListener('change', e=> {
+    if(!e.target.files.length||!$('#editId').value)return;
+    const old=$('#currentEvidenceFile').textContent.replace(/^Current file:\s*/i, '');
+    if(!confirm(`Selecting a new file will replace the existing file${old?` (${old}
+    )`:''}. Continue?`))e.target.value=''
+}
+);
+$('#evidenceForm')?.addEventListener('submit', async e=> {
+    e.preventDefault();
+    const eid=$('#editId').value?+$('#editId').value:null, old=eid?await DB.get(eid):null, file=$('#evidenceFile').files[0]||old?.file||null, type=selectedType(), m=mapping(), criteria=[...new Set(Object.values(m).flat())], cfg=APP_DATA.evidenceTypes.find(x=>x.id===type);
+    if(!file&&!old)return toast('Please choose an evidence file');
+    if(!type)return toast('Select an evidence type');
+    if(cfg?.secondaryOptions?.length&&!selectedSubtypes().length)return toast('Select what this evidence covers');
+    if(!criteria.length)return toast('Select at least one criterion');
+    const date=$('#evidenceDate').value, matches=eid?[]:evidence.filter(i=>i.date===date&&ptype(i)===type);
+    if(matches.length) {
+        const d=await duplicateDecision(matches);
+        if(d.action==='discard') {
+            resetForm();
+            go('dashboard');
+            return toast('Duplicate entry discarded')
+        }
+        if(d.action==='amend')return editEvidence(d.existing.id)
+    }
+    const item= {
+        ...(old|| {
+        }
+        ), id:eid||Date.now(), title:$('#evidenceTitle').value.trim(), date, file, fileName:file?.name||old?.fileName||'', evidenceType:type, evidenceSubtypes:selectedSubtypes(), appraisalObjectivesCompleted:type==='Appraisal'&&!!$('#appraisalObjectivesCompleted')?.checked, criteria, domains:Object.keys(m).map(Number), reflection:old?.reflection||null, reflectionFile:old?.reflectionFile, reflectionFileName:old?.reflectionFileName, reflectionFileType:old?.reflectionFileType, updated:new Date().toISOString()
+    }
+    ;
+    delete item.evidenceTypes;
+    await DB.put(item);
+    evidence=await DB.all();
+    notePortfolioChange();
+    toast('Evidence saved');
+    if(!reflectionText(item))await continueAfterEvidenceSave(item);
+    else go('library')
+}
+);
+function renderLibrary() {
+    const q=($('#librarySearch')?.value||'').toLowerCase(), missingOnly=!!$('#reflectionMissingFilter')?.checked, list=evidence.filter(i=>(!missingOnly||!reflectionText(i))&&[i.title, ptype(i), ...subs(i), ...(i.criteria||[])].join(' ').toLowerCase().includes(q));
+    $('#evidenceLibrary').innerHTML=list.length?list.sort((a, b)=>(b.date||'').localeCompare(a.date||'')).map(i=> {
+        const a=getEvidenceAgeStatus(i.date), none=!reflectionText(i);
+        return`<article class="library-item"><h3>${esc(i.title)}</h3><div class="meta"><span>${fmtDate(i.date)}</span><span>${esc(i.fileName)}</span><span class="evidence-age-badge ${a.status}">${a.label}</span><span class="reflection ${none?'no':'yes'}">${reflectionStatusLabel(i)}</span></div>${a.message?`<div class="evidence-age-alert ${a.status}">${a.message}
+        </div>`:''}<div class="chips"><span class="chip primary-type">${esc(ptype(i))}</span>${subs(i).map(x=>`<span class="chip">${esc(x)}
+        </span>`).join('')}${i.appraisalObjectivesCompleted?'<span class="chip">Completed objectives recorded</span>':''}${(i.criteria||[]).map(x=>`<span class="chip">${x}
+        </span>`).join('')}</div><div class="item-actions"><button class="ghost edit-item" data-id="${i.id}">Edit</button>${none?`<button class="secondary reflect-item" data-id="${i.id}">Write Reflection</button><button class="secondary upload-reflection-item" data-id="${i.id}">Upload Reflection</button>`:''}</div></article>`
+    }
+    ).join(''):'<p>No matching evidence has been added.</p>'
+}
+$('#librarySearch')?.addEventListener('input', renderLibrary);
+document.addEventListener('click', async e=> {
+    let b=e.target.closest('.edit-item');
+    if(b)return editEvidence(+b.dataset.id);
+    b=e.target.closest('.reflect-item,.edit-written-reflection');
+    if(b)return openReflection(+b.dataset.id);
+    b=e.target.closest('.upload-reflection-item,.edit-upload-reflection');
+    if(b)return chooseReflectionFile(+b.dataset.id);
+    b=e.target.closest('.download-reflection-item');
+    if(b) {
+        const i=await DB.get(+b.dataset.id);
+        if(i?.reflectionFile)downloadStoredBlob(i.reflectionFile, i.reflectionFileName);
+        return
+    }
+    b=e.target.closest('.delete-written-reflection');
+    if(b&&confirm('Delete the written reflection from this evidence item?')) {
+        const i=await DB.get(+b.dataset.id);
+        i.reflection=null;
+        await DB.put(i);
+        evidence=await DB.all();
+        notePortfolioChange();
+        await editEvidence(i.id);
+        return toast('Written reflection deleted')
+    }
+    b=e.target.closest('.delete-uploaded-reflection');
+    if(b&&confirm('Delete the uploaded reflection file from this evidence item?')) {
+        const i=await DB.get(+b.dataset.id);
+        delete i.reflectionFile;
+        delete i.reflectionFileName;
+        delete i.reflectionFileType;
+        await DB.put(i);
+        evidence=await DB.all();
+        notePortfolioChange();
+        await editEvidence(i.id);
+        return toast('Uploaded reflection deleted')
+    }
+    b=e.target.closest('.delete-evidence-from-edit');
+    if(b&&confirm('Delete this evidence item?')) {
+        await DB.remove(+b.dataset.id);
+        evidence=await DB.all();
+        notePortfolioChange();
+        resetForm();
+        go('library');
+        return toast('Evidence deleted')
+    }
+}
+);
+async function openReflection(id) {
+    const i=await DB.get(id);
+    $('#reflectionId').value=id;
+    $('#reflectionTitle').textContent=`Reflection: ${i.title}`;
+    ['situation', 'hindrances', 'actions', 'results', 'plan'].forEach(k=>$('#'+k).value=i.reflection?.[k]||'');
+    go('reflection')
+}
+$('#reflectionForm')?.addEventListener('submit', async e=> {
+    e.preventDefault();
+    const i=await DB.get(+$('#reflectionId').value);
+    i.reflection= {
+        situation:$('#situation').value, hindrances:$('#hindrances').value, actions:$('#actions').value, results:$('#results').value, plan:$('#plan').value
+    }
+    ;
+    await DB.put(i);
+    evidence=await DB.all();
+    notePortfolioChange();
+    toast('Reflection saved');
+    go('library')
+}
+);
+async function isAllowedReflectionFile(file) {
+    const name=String(file?.name||'').toLowerCase(), extension=name.includes('.')?name.slice(name.lastIndexOf('.')):'', bytes=new Uint8Array(await file.slice(0, 8).arrayBuffer()), starts=(...values)=>values.every((value, index)=>bytes[index]===value);
+    if(extension==='.docx')return starts(0x50, 0x4b);
+    if(extension!=='.txt')return false;
+    if(starts(0x25, 0x50, 0x44, 0x46)||starts(0x89, 0x50, 0x4e, 0x47)||starts(0xff, 0xd8, 0xff)||starts(0x47, 0x49, 0x46, 0x38)||starts(0x50, 0x4b))return false;
+    try {
+        new TextDecoder('utf-8', {
+            fatal:true
+        }
+        ).decode(await file.arrayBuffer());
+        return true
+    } catch(error) {
+        return false
+    }
+}
+function chooseReflectionFile(id) {
+    const x=document.createElement('input');
+    x.type='file';
+    x.accept='.docx,.txt,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain';
+    x.hidden=true;
+    document.body.append(x);
+    x.addEventListener('change', async()=> {
+        const f=x.files[0];
+        x.remove();
+        if(!f)return;
+        if(!await isAllowedReflectionFile(f)) {
+            alert('Only text-based reflection files are accepted. Upload a Word document (.docx) or plain text file (.txt). PDF files, images and Apple Pages files are not accepted.');
+            return
+        }
+        const i=await DB.get(id);
+        if(i.reflectionFile&&!confirm(`Replace the existing uploaded reflection file (${i.reflectionFileName||'current file'})?`))return;
+        i.reflectionFile=f;
+        i.reflectionFileName=f.name;
+        i.reflectionFileType=f.type||'application/octet-stream';
+        await DB.put(i);
+        evidence=await DB.all();
+        notePortfolioChange();
+        if($('#editId')?.value==String(id))await editEvidence(id);
+        else {
+            renderLibrary();
+            renderDashboard()
+        }
+        toast('Reflection uploaded')
+    }
+    , {
+        once:true
+    }
+    );
+    x.click()
+}
+function downloadStoredBlob(b, n) {
+    const u=URL.createObjectURL(b), a=document.createElement('a');
+    a.href=u;
+    a.download=n||'reflection';
+    document.body.append(a);
+    a.click();
+    setTimeout(()=> {
+        URL.revokeObjectURL(u);
+        a.remove()
+    }
+    , 1500)
+}
+$('#saveProfile')?.addEventListener('click', ()=> {
+    localStorage.setItem('portfolioProfile', JSON.stringify( {
+        name:$('#candidateName')?.value.trim()||'', specialty:$('#candidateSpecialty')?.value.trim()||''
+    }
+    ));
+    toast('Portfolio details saved')
+}
+);
+$('#fullExport')?.addEventListener('click', ()=>exportFull(evidence));
+$('#indexedExport')?.addEventListener('click', ()=>exportIndexed(evidence));
+$('#menuBtn')?.addEventListener('click', ()=>$('#nav').classList.toggle('open'));
+function ensureExportEditingNote() {
+    if($('#portfolioEditingNote'))return;
+    const screen=$('#export'), grid=screen?.querySelector('.export-grid');
+    if(!screen)return;
+    const note=document.createElement('div');
+    note.id='portfolioEditingNote';
+    note.className='suggest portfolio-editing-note';
+    note.innerHTML='<b>Portfolio documents can be edited after export.</b><p>You can add or remove information and change the formatting before sharing or submitting the portfolio. For the Indexed Portfolio Pack, the <b>Portfolio Document and folder</b> may be renamed, but the structure inside the folder must remain unchanged so the evidence links continue to work.</p>';
+    if(grid)grid.insertAdjacentElement('beforebegin', note);
+    else screen.insertAdjacentElement('afterbegin', note)
+}
+window.addEventListener('DOMContentLoaded', async()=> {
+    evidence=await DB.all();
+    ensureLibraryReflectionFilter();
+    ensureExportEditingNote();
+    renderTypes();
+    ensureControls();
+    renderSecondaryOptions();
+    renderDomainMapper();
+    renderDashboard();
+    const p=JSON.parse(localStorage.getItem('portfolioProfile')||'{}');
+    if($('#candidateName'))$('#candidateName').value=p.name||'';
+    if($('#candidateSpecialty'))$('#candidateSpecialty').value=p.specialty||'';
+    if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(()=> {
+    }
+    )
+}
+);
